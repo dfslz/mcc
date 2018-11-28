@@ -1,7 +1,8 @@
 #include <iostream>
 #include <string>
-#include "./module/common/common.h"
-#include "./module/scanner/scanner.h"
+#include "common.h"
+#include "scanner.h"
+#include "SymbolList.h"
 
 int main() {
     synbl.insert("1234");

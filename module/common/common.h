@@ -6,7 +6,20 @@
 #include "TypeList.h"
 #include "ConstantList.h"
 
-const int _id_len = 100;//id最大长度
+//id最大长度
+const int _id_len = 100;
+
+//各类常量表
+extern ConstantList<int> intList;
+extern ConstantList<float> floatList;
+extern ConstantList<char> charList;
+extern ConstantList<char*> strList;
+
+//符号表
+extern SymbolList synbl;
+
+//类型表
+extern TypeList typelist;
 
 #endif
 

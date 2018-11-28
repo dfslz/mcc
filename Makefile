@@ -1,16 +1,20 @@
-mcc: mcc.o SymbolList.o Common.o
-	g++ -o mcc mcc.o SymbolList.o common.o
+cc = g++
+target = mcc
+object = mcc.o SymbolList.o common.o
 
-mcc.o: mcc.cpp
-	g++ mcc.cpp -c
+TOP_PATH = $(shell pwd)
 
-SymbolList.o: ./module/common/SymbolList.cpp
-	g++ ./module/common/SymbolList.cpp -c
+CPPFLAGS = -I$(TOP_PATH)/module/common
 
-Common.o: ./module/common/common.cpp
-	g++ ./module/common/common.cpp -c
+vpath % ./module/common
+vpath % ./module/scanner
 
+$(target): $(object)
+	$(cc) $(object) -o $(target)
+
+$(object, *.o): %.o : %.cpp
+	$(cc) -c $(CPPFLAGS)  $< -o $@
+
+.PHONY: clean
 clean:
-	rm common.o
-	rm mcc.o
-	rm SymbolList.o
+	-rm $(target) $(object)

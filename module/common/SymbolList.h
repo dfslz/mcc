@@ -38,7 +38,6 @@ private:
     static data list[ _size ];
 };
 
-extern SymbolList synbl;
 
 #endif
 

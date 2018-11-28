@@ -14,11 +14,5 @@ private:
     T list[listMax];
 };
 
-//各类常量表
-extern ConstantList<int> intList;
-extern ConstantList<float> floatList;
-extern ConstantList<char> charList;
-extern ConstantList<char*> strList;
-
 #endif
 

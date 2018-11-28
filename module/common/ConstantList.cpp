@@ -1,10 +1,5 @@
 #include "ConstantList.h"
 
-ConstantList<int> intList;
-ConstantList<float> floatList;
-ConstantList<char> charList;
-ConstantList<char*> strList;
-
 template<class T>
 void ConstantList<T>::set(int position, T value) {
     list[position] = value;

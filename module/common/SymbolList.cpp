@@ -1,6 +1,5 @@
 #include "SymbolList.h"
 
-SymbolList synbl;
 //初始化静态变量
 int SymbolList::_position = 0;
 SymbolList::data SymbolList::list[] = {};
