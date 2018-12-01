@@ -4,8 +4,9 @@
 class Token {
 public:
     enum Categories {
-        keyword, id, integer, real, ch, str
+        keyword, id, integer, real, ch, str, null
     };
+    Token() { _offset = 0; _category = null; }
     //setter
     void setCategory(Categories category);
     void setOffset(int offset);

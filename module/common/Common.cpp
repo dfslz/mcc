@@ -23,12 +23,12 @@ std::string kwd[kwd_num] = {
     "float",
     "char"
 };
-const ConstantList<std::string> keywordList(kwd_num, kwd);
+ConstantList<std::string> keywordList(kwd_num, kwd);
 
 //界符和运算符表
-const int op_num = 10;
+const int op_num = 14;
 std::string opt[op_num] = {
     "+", "-", "*", "/", "=", "==",
-    ">", "<", ">=", "<="
+    ">", "<", ">=", "<=", "(", ")", "{", "}"
 };
-const ConstantList<std::string> opList(op_num, opt);
+ConstantList<std::string> opList(op_num, opt);

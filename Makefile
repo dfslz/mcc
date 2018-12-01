@@ -1,20 +1,26 @@
 cc = g++
 target = mcc
-object = mcc.o SymbolList.o common.o
+main = mcc.o
+object = SymbolList.o Common.o Token.o TypeList.o Buffer.o Scanner.o
 
 TOP_PATH = $(shell pwd)
 
-CPPFLAGS = -I$(TOP_PATH)/module/common
+CPPFLAGS = -I$(TOP_PATH)/module/common -I$(TOP_PATH)/module/scanner
 
 vpath % ./module/common
 vpath % ./module/scanner
 
-$(target): $(object)
-	$(cc) $(object) -o $(target)
+$(target): $(object) $(main)
+	$(cc) $(object) $(main) -o $(target)
 
-$(object, *.o): %.o : %.cpp
+$(main):%.o: %.cpp
+	$(cc) -c $(CPPFLAGS) $< -o $@
+
+$(object):%.o : %.h
+$(object): %.o : %.cpp
 	$(cc) -c $(CPPFLAGS)  $< -o $@
 
 .PHONY: clean
 clean:
 	-rm $(target) $(object)
+

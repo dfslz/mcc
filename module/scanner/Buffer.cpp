@@ -1,5 +1,8 @@
 #include "Buffer.h"
 
+int Buffer::_bp = 0;
+std::string Buffer::buf;
+
 void Buffer::next() {
     ++_bp;
     if(buf[_bp] == '\0') {
@@ -9,8 +12,8 @@ void Buffer::next() {
     }
 }
 
-char Buffer::get() {
-    return buf[_bp];
+char Buffer::get(int bp, std::string buff) {
+    return buff[bp];
 }
 
 bool Buffer::isFileEnd() {

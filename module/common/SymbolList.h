@@ -38,6 +38,5 @@ private:
     static data list[ _listMax ];
 };
 
-
 #endif
 

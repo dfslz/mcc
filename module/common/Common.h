@@ -27,10 +27,10 @@ extern SymbolList synbl;
 extern TypeList typelist;
 
 //关键字表
-extern const ConstantList<std::string> keywordList;
+extern ConstantList<std::string> keywordList;
 
 //界符和运算符表
-extern const ConstantList<std::string> opList;
+extern ConstantList<std::string> opList;
 
 #endif
 
