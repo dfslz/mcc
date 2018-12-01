@@ -12,14 +12,14 @@ public:
     TypeValue getType(int position);
     void insert(TypeValue type, int offset);
 private:
-    const static int listMax = 1e5;
+    const static int _listMax = 1e5;
     static int pos;
 
     struct data {
         TypeValue _type;
         int _offset;
     };
-    static data list[listMax];
+    static data list[ _listMax ];
 };
 
 #endif

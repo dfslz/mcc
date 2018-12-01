@@ -1,7 +1,7 @@
 #include "TypeList.h"
 
 int TypeList::pos = 5;
-TypeList::data TypeList::list[TypeList::listMax] = {};
+TypeList::data TypeList::list[TypeList::_listMax] = {};
 
 void TypeList::setType(int position, TypeList::TypeValue type) {
     list[position]._type = type;

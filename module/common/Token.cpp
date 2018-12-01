@@ -4,11 +4,11 @@ void Token::setOffset(int offset) {
     _offset = offset;
 }
 
-void Token::setCategory(SymbolList::Categories category) {
+void Token::setCategory(Token::Categories category) {
     _category = category;
 }
 
-SymbolList::Categories Token::getCategory() {
+Token::Categories Token::getCategory() {
     return _category;
 }
 

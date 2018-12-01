@@ -1,19 +1,20 @@
 #ifndef _TOKEN_H
 #define _TOKEN_H
 
-#include "SymbolList.h"
-
 class Token {
 public:
+    enum Categories {
+        keyword, id, integer, real, ch, str
+    };
     //setter
-    void setCategory(SymbolList::Categories category);
+    void setCategory(Categories category);
     void setOffset(int offset);
     //getter
-    SymbolList::Categories getCategory();
+    Categories getCategory();
     int getOffset();
 
 private:
-    SymbolList::Categories _category;
+    Categories _category;
     int _offset;
 };
 

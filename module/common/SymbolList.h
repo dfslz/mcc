@@ -25,7 +25,7 @@ public:
     Categories getCategory(int position);
 
 private:
-    const static int _size = 1e5;//符号表大小
+    const static int _listMax = 1e5;//符号表大小
     static int _position;//当前符号表中未被使用的最低位置
 
     //存储结构体
@@ -35,7 +35,7 @@ private:
         Categories _category;
         int _offset;
     };
-    static data list[ _size ];
+    static data list[ _listMax ];
 };
 
 
