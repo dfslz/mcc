@@ -10,6 +10,7 @@ public:
     T get(int position);
     int size();
     int insert(T value);
+    int find(T value);
     
 private:
     const static int listMax = 1e5;
@@ -35,6 +36,7 @@ int ConstantList<T>::insert(T value) {
 
 template<class T>
 ConstantList<T>::ConstantList(int size, T* arr) {
+    _size = 0;
     for(int i = 0; i < size; ++i) {
         this->insert(arr[i]);
     }
@@ -43,6 +45,18 @@ ConstantList<T>::ConstantList(int size, T* arr) {
 template<class T>
 int ConstantList<T>::size() {
     return _size;
+}
+
+template<class T>
+int ConstantList<T>::find(T value) {
+    int pos = -1;
+    for(int i = 0; i < _size; ++i) {
+        if(value == get(i)) {
+            pos = i;
+            break;
+        }
+    }
+    return pos;
 }
 
 #endif

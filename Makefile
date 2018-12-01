@@ -22,5 +22,5 @@ $(object): %.o : %.cpp
 
 .PHONY: clean
 clean:
-	-rm $(target) $(object)
+	-rm $(target) $(object) $(main)
 

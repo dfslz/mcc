@@ -16,6 +16,33 @@ Token Scanner::next() {
     }
 
     //TODO 按照得到的类型分别生成对应的token
+    if(_type == 0) {//整型
+        tk.setCategory(Token::integer);
+        tk.setOffset(intList.insert(std::stoi(word)));
+    } else if(_type == 1) {//关键字或标识符
+        int pos = keywordList.find(word);
+        if(pos != -1) {//是关键字
+            tk.setCategory(Token::keyword);
+            tk.setOffset(pos);
+        } else {//是标识符
+            tk.setCategory(Token::id);
+            pos = synbl.find(word);
+            if(pos != -1) tk.setOffset(pos);//已定义的标识符
+            else tk.setOffset(synbl.insert(word));//加入新定义标识符
+        }
+    } else if(_type == 2) {//浮点数
+        tk.setCategory(Token::real);
+        tk.setOffset(floatList.insert(std::stof(word)));
+    } else if(_type == 3) {//符号
+        tk.setCategory(Token::symbol);
+        tk.setOffset(opList.find(word));
+    } else if(_type == 4) {//字符常量
+        tk.setCategory(Token::ch);
+        tk.setOffset(charList.insert(word[1]));
+    } else if(_type == 5) {
+        tk.setCategory(Token::str);
+        tk.setOffset(strList.insert(word));
+    }
     
     return tk;
 }

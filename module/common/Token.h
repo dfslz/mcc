@@ -4,7 +4,7 @@
 class Token {
 public:
     enum Categories {
-        keyword, id, integer, real, ch, str, null
+        keyword, id, integer, real, ch, str, symbol, null
     };
     Token() { _offset = 0; _category = null; }
     //setter
