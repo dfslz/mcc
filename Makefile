@@ -14,11 +14,11 @@ $(target): $(object) $(main)
 	$(cc) $(object) $(main) -o $(target)
 
 $(main):%.o: %.cpp
-	$(cc) -c $(CPPFLAGS) $< -o $@
+	$(cc) -c $(CPPFLAGS) $< 
 
 $(object):%.o : %.h
 $(object): %.o : %.cpp
-	$(cc) -c $(CPPFLAGS)  $< -o $@
+	$(cc) -c $(CPPFLAGS) $<
 
 .PHONY: clean
 clean:

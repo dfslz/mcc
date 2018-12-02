@@ -9,6 +9,7 @@
 
 class Scanner {
 public:
+    Scanner() { _state = 0; _type = -1; }
     Token next();
 
 private:
@@ -20,7 +21,7 @@ private:
     const static int stateEnd = 8;
     
     std::string word;//存放扫描到的合法串
-    Buffer buffer;//缓冲区
+    static Buffer buffer;//缓冲区
     int _state;
     int _type;
 
@@ -31,8 +32,6 @@ private:
     int getOrder(char ch);
     bool issymbol(char ch);
 };
-
-extern Scanner scanner;
 
 #endif
 

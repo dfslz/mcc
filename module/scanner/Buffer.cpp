@@ -1,22 +1,24 @@
 #include "Buffer.h"
 
 int Buffer::_bp = 0;
-std::string Buffer::buf;
+char Buffer::buf[] = "";
 
 void Buffer::next() {
-    ++_bp;
-    if(buf[_bp] == '\0') {
-        if(fin >> buf) {
+    if(get() == '\0') {
+        if(fin.getline(buf, _buf_size)) {
             _bp = 0;
         }
+    } else {
+        ++_bp;
     }
 }
 
-char Buffer::get(int bp, std::string buff) {
-    return buff[bp];
+char Buffer::get() {
+    return buf[_bp];
 }
 
 bool Buffer::isFileEnd() {
+    if(get() == '\0') next();//排除未初始化的情况
     if(get() == '\0') return true;
     return false;
 }

@@ -5,14 +5,15 @@
 
 class Buffer {
 public:
-    Buffer() { _bp = 0; buf[0] = '\0'; next(); };
-    void next();
-    static char get(int bp = _bp, std::string buff = buf);
+    Buffer() { _bp = 0; buf[1] = '\0'; next(); };
+    static void next();
+    static char get();
     static bool isFileEnd();
 
 private:
+    const static int _buf_size = _id_len << 4;
     static int _bp;
-    static std::string buf;
+    static char buf[ _buf_size ];
 };
 
 #endif

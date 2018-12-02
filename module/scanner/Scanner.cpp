@@ -1,21 +1,29 @@
 #include "Scanner.h"
 
-Scanner scanner;
+Buffer Scanner::buffer;
 
 Token Scanner::next() {
     Token tk;
     _state = stateBegin;
     _type = -1;
+    word = "";
 
     while(_state != stateEnd) {
         char ch = buffer.get();//只读当前字符,buffer指针不动
+        //std::cout << ch << " " << _state << " ";
         if(behavior(ch)) {//只有behavior()接收了字符才移动buffer指针
             buffer.next();
         }
-        stateTransition(ch);//状态转移函数
+        //stateTransition(ch);//状态转移函数
+        if(_state == -1) {
+            std::cout << "state changed into -1\n";
+            _type = -1;
+            break;
+        }
     }
+    //std::cout << std::endl;
 
-    //TODO 按照得到的类型分别生成对应的token
+    //按照得到的类型分别生成对应的token
     if(_type == 0) {//整型
         tk.setCategory(Token::integer);
         tk.setOffset(intList.insert(std::stoi(word)));
@@ -39,9 +47,13 @@ Token Scanner::next() {
     } else if(_type == 4) {//字符常量
         tk.setCategory(Token::ch);
         tk.setOffset(charList.insert(word[1]));
-    } else if(_type == 5) {
+    } else if(_type == 5) {//字符串
         tk.setCategory(Token::str);
         tk.setOffset(strList.insert(word));
+    } else {
+        std::cout <<"can not clearfy token type" << std::endl;
+        tk.setCategory(Token::null);
+        tk.setOffset(-1);
     }
     
     return tk;
@@ -49,8 +61,9 @@ Token Scanner::next() {
 
 bool Scanner::behavior(char ch) {
     bool ok = false;
-    if(stateTransTable[_state][getOrder(ch)] != -1) {
-        word += ch;
+    stateTransition(ch);
+    if(_state != -1 && _state != stateEnd) {
+        if(_state != stateBegin) word += ch;
         ok = true;
     }
     //判断合法字符的类型
@@ -68,10 +81,14 @@ bool Scanner::behavior(char ch) {
 bool Scanner::issymbol(char ch) {
     bool ok = false;
     for(int i = 0; i < opList.size(); ++i) {
-        if(ch == opList.get(i)[word.size()]) {
+        std::string s = opList.get(i);
+        if(s.size() > word.size() && ch == s[word.size()]) {
+            //std::cout << s[word.size()] << ":" << ch << std::endl;
             ok = true;
+            break;
         }
     }
+    //getchar();
     return ok;
 }
 
@@ -79,7 +96,7 @@ void Scanner::stateTransition(char ch) {
     _state = stateTransTable[_state][getOrder(ch)];
 }
 
-int Scanner::getOrder(char ch) {
+int Scanner::getOrder(char ch) {//获取对于于转移表的顺序位置
     int order;
     if(isalpha(ch)) order = 0;//这里后面要对指数'E/e'特殊处理一下
     else if(isdigit(ch)) order = 1;
