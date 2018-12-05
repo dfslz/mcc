@@ -1,5 +1,7 @@
 #include "Scanner.h"
 
+Scanner scanner;
+
 Buffer Scanner::buffer;
 
 Token Scanner::next() {

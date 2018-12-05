@@ -33,5 +33,7 @@ private:
     bool issymbol(char ch);
 };
 
+extern Scanner scanner;
+
 #endif
 

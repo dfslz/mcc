@@ -39,7 +39,6 @@ int main(int argc, char** argv) {
 
     fin.open(argv[1], std::ios_base::in);
 
-    Scanner scanner;
     while(!Buffer::isFileEnd()) {
         Token tk = scanner.next();
         print(tk);
