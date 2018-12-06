@@ -16,3 +16,11 @@ int Token::getOffset() {
     return _offset;
 }
 
+void Token::setActivity(bool activity) {
+    _activity = activity;
+}
+
+bool Token::getActivity() {
+    return _activity;
+}
+

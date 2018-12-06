@@ -6,7 +6,7 @@
 class SymbolList {
 public:
     enum Categories {
-        constant, type, various
+        label, various
     };
 
     //setter
@@ -14,6 +14,7 @@ public:
     void setType(int position, int type);
     void setCategory(int position, Categories category);
     void setOffset(int position, int offset);
+    void setActivity(int position, bool activity);
 
     //function
     int find(std::string name);
@@ -23,6 +24,7 @@ public:
     std::string getName(int position);
     int getType(int position);
     Categories getCategory(int position);
+    bool getActivity(int position);
 
 private:
     const static int _listMax = 1e5;//符号表大小
@@ -34,6 +36,7 @@ private:
         int _type;
         Categories _category;
         int _offset;
+        bool _activity;
     };
     static data list[ _listMax ];
 };

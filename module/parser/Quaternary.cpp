@@ -1,10 +1,10 @@
 #include "Quaternary.h"
 
-Quaternary quater;
+//Quaternary quater;
 
 Quaternary::Quat Quaternary::list[] = {};
 
-int Quaternary::insert(Option option, std::string first, std::string second, std::string target) {
+int Quaternary::insert(Option option, Token first, Token second, Token target) {
     list[_size]._option = option;
     list[_size]._fisrt = first;
     list[_size]._second = second;

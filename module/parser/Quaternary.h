@@ -11,11 +11,11 @@ public:
 
     struct Quat {
         Option _option;
-        std::string _fisrt, _second, _target;
+        Token _fisrt, _second, _target;
     };
 
     Quaternary() { _size = 0; }
-    int insert(Option option, std::string first, std::string second, std::string target);
+    int insert(Option option, Token first, Token second, Token target);
     Quat get(int position);
     int size();
 private:
@@ -24,6 +24,6 @@ private:
     static Quat list[_quat_max];
 };
 
-extern Quaternary quater;
+//extern Quaternary quater;
 
 #endif

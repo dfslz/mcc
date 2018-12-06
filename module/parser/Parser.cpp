@@ -2,7 +2,7 @@
 
 Parser parser;
 
-bool Parser::analyze() {
+bool Parser::parse() {
     tk = scanner.next();
     if(tk.getCategory() == Token::id) {
         //TODO 记录子程序id
@@ -15,7 +15,7 @@ bool Parser::analyze() {
 
     if(tk.getCategory() != Token::symbol 
             || opList.get(tk.getOffset()) == ";") {
-        //没有以分号结尾
+        //没有以分号结尾,返回错误1
         return false;
     }
     return true;

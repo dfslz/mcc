@@ -4,33 +4,30 @@
 int SymbolList::_position = 0;
 SymbolList::data SymbolList::list[ SymbolList::_listMax ] = {};
 
-void SymbolList::setName(int position, std::string name)
-{
+void SymbolList::setName(int position, std::string name) {
     list[position]._name = name;
 }
 
-void SymbolList::setType(int position, int type)
-{
+void SymbolList::setType(int position, int type) {
     list[position]._type = type;
 }
 
-void SymbolList::setCategory(int position, SymbolList::Categories category)
-{
+void SymbolList::setCategory(int position, SymbolList::Categories category) {
     list[position]._category = category;
 }
 
-void SymbolList::setOffset(int position, int offset)
-{
+void SymbolList::setOffset(int position, int offset) {
     list[position]._offset = offset;
 }
 
-int SymbolList::find(std::string name)
-{
+void SymbolList::setActivity(int position, bool activity) {
+    list[position]._activity = activity;
+}
+
+int SymbolList::find(std::string name) {
     int res = -1;
-    for (int pos = 0; pos < _position; ++pos)
-    {
-        if (list[pos]._name == name)
-        {
+    for (int pos = 0; pos < _position; ++pos) {
+        if (list[pos]._name == name) {
             res = pos;
             break;
         }
@@ -38,11 +35,9 @@ int SymbolList::find(std::string name)
     return res;
 }
 
-int SymbolList::insert(std::string name)
-{
+int SymbolList::insert(std::string name) {
     int res = find(name);
-    if (res == -1)
-    {
+    if (res == -1) {
         list[_position]._name = name;
         res = _position;
         ++_position;
@@ -50,17 +45,18 @@ int SymbolList::insert(std::string name)
     return res;
 }
 
-std::string SymbolList::getName(int position)
-{
+std::string SymbolList::getName(int position) {
     return list[position]._name;
 }
 
-int SymbolList::getType(int position)
-{
+int SymbolList::getType(int position) {
     return list[position]._type;
 }
 
-SymbolList::Categories SymbolList::getCategory(int position)
-{
+SymbolList::Categories SymbolList::getCategory(int position) {
     return list[position]._category;
+}
+
+bool SymbolList::getActivity(int position) {
+    return list[position]._activity;
 }

@@ -33,11 +33,15 @@ void print(Token& tk) {
 
 int main(int argc, char** argv) {
     if(argc < 2) {
-         cout << "please input target file";
+         cout << "please input target file" << endl;
          return 0;
     }
 
     fin.open(argv[1], std::ios_base::in);
+    if(!fin) {
+        cout << "not a valide input" << endl;
+        return 0;
+    }
 
     while(!Buffer::isFileEnd()) {
         Token tk = scanner.next();
