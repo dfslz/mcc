@@ -4,7 +4,7 @@
 ## 使用方法
 ````
 make
-mcc target.mcc
+./mcc target.mcc
 ````
 
 ## 清除
