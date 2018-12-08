@@ -1,11 +1,11 @@
 #ifndef _BUFFER_H
 #define _BUFFER_H
 
-#include "../common/Common.h"
+#include "Common.h"
 
 class Buffer {
 public:
-    Buffer() { _bp = 0; buf[1] = '\0'; next(); };
+    Buffer() { _bp = 0; buf[0] = '\0'; };
     static void next();
     static char get();
     static bool isFileEnd();

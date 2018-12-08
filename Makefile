@@ -16,7 +16,6 @@ $(target): $(object) $(main)
 
 $(main):%.o: %.cpp
 	$(cc) -c $(CPPFLAGS) $< 
-
 $(object):%.o : %.h
 $(object): %.o : %.cpp
 	$(cc) -c $(CPPFLAGS) $<

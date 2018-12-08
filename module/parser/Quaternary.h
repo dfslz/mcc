@@ -24,6 +24,5 @@ private:
     static Quat list[_quat_max];
 };
 
-//extern Quaternary quater;
 
 #endif

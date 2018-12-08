@@ -10,6 +10,7 @@ int Quaternary::insert(Option option, Token first, Token second, Token target) {
     list[_size]._second = second;
     list[_size]._target = target;
     ++_size;
+    return _size;
 }
 
 Quaternary::Quat Quaternary::get(int position) {

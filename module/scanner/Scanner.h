@@ -21,7 +21,7 @@ private:
     const static int stateEnd = 8;
     
     std::string word;//存放扫描到的合法串
-    static Buffer buffer;//缓冲区
+    Buffer buffer;//缓冲区
     int _state;
     int _type;
 

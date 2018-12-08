@@ -2,7 +2,7 @@
 
 Scanner scanner;
 
-Buffer Scanner::buffer;
+//Buffer Scanner::buffer;
 
 Token Scanner::next() {
     Token tk;

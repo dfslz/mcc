@@ -22,13 +22,13 @@ bool Parser::parse() {
     }
     
     tk = scanner.next();
-    if(tk.getCategory != Token::keyword
+    if(tk.getCategory() != Token::keyword
             || keywordList.get(tk.getOffset()) != "end") {
         //TODO 回到sentence();
     }
 
     tk = scanner.next();
-    if(tk.getCategory != Token::id
+    if(tk.getCategory() != Token::id
             || subProgram != tk.getOffset()) {
         return false;
     }
