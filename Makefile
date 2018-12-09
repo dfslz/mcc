@@ -1,4 +1,6 @@
-cc = g++
+#cc = g++
+cc = clang 
+CLANGFLAG = -lstdc++ 
 target = mcc
 main = mcc.o
 object = SymbolList.o Common.o Token.o TypeList.o Buffer.o Scanner.o
@@ -12,7 +14,7 @@ vpath % ./module/scanner
 vpath % ./module/parser
 
 $(target): $(object) $(main)
-	$(cc) $(object) $(main) -o $(target)
+	$(cc) $(CLANGFLAG) $(object) $(main) -o $(target)
 
 $(main):%.o: %.cpp
 	$(cc) -c $(CPPFLAGS) $< 

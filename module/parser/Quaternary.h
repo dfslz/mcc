@@ -5,17 +5,13 @@
 
 class Quaternary {
 public:
-    enum Option{
-        add, sub, mul, div, equal
-    };
-
     struct Quat {
-        Option _option;
+        std::string _option;
         Token _fisrt, _second, _target;
     };
 
     Quaternary() { _size = 0; }
-    int insert(Option option, Token first, Token second, Token target);
+    int insert(std::string option, Token first, Token second, Token target);
     Quat get(int position);
     int size();
 private:

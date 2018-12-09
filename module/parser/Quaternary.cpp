@@ -4,7 +4,7 @@
 
 Quaternary::Quat Quaternary::list[] = {};
 
-int Quaternary::insert(Option option, Token first, Token second, Token target) {
+int Quaternary::insert(std::string option, Token first, Token second, Token target) {
     list[_size]._option = option;
     list[_size]._fisrt = first;
     list[_size]._second = second;
