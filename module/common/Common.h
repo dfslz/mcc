@@ -7,6 +7,7 @@
 #include "Token.h"
 #include "TypeList.h"
 #include "ConstantList.h"
+#include "Quaternary.h"
 
 //目标文件输入流
 extern std::ifstream fin;
@@ -31,6 +32,9 @@ extern ConstantList<std::string> keywordList;
 
 //界符和运算符表
 extern ConstantList<std::string> opList;
+
+//四元式序列
+extern ConstantList<Quaternary> quaterList;
 
 #endif
 

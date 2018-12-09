@@ -3,6 +3,7 @@
 Parser parser;
 
 bool Parser::parse() {
+    tk = scanner.next();
     int subProgram;
 
     if(tk.getCategory() == Token::id) {

@@ -32,3 +32,6 @@ std::string opt[op_num] = {
     ">", "<", ">=", "<=", "(", ")", "{", "}", ";", ","
 };
 ConstantList<std::string> opList(op_num, opt);
+
+//四元式序列
+ConstantList<Quaternary> quaterList;

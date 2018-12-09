@@ -3,7 +3,7 @@ cc = clang
 CLANGFLAG = -lstdc++ 
 target = mcc
 main = mcc.o
-object = SymbolList.o Common.o Token.o TypeList.o Buffer.o Scanner.o
+object = SymbolList.o Common.o Token.o TypeList.o Buffer.o Scanner.o Quaternary.o
 
 TOP_PATH = $(shell pwd)
 
