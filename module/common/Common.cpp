@@ -16,12 +16,13 @@ SymbolList synbl;
 TypeList typelist;
 
 //关键字表
-const int kwd_num = 4;
+const int kwd_num = 5;
 std::string kwd[kwd_num] = {
     "int",
-    "main",
     "float",
-    "char"
+    "char",
+    "void",
+    "string"
 };
 ConstantList<std::string> keywordList(kwd_num, kwd);
 

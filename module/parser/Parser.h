@@ -6,7 +6,7 @@
 
 class Parser {
 public:
-    Parser() {  }
+    Parser(); 
     bool parse();//分析一个句子,返回是否合法并将合法句子生成四元式
 
 private:
