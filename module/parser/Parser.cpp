@@ -168,6 +168,10 @@ const static int LLOne[5][8] = {
     { 8, -1, -1, -1, -1, 9, -1, -1 }
 };
 
+//记录生成的四元式数量,用于判断表达式为f=10;这样的简单赋值语句
+int count = 0;
+Token returnToken;
+
 bool Parser::isConstantOrIdentify(Token::Categories cat) {
     if(cat == Token::id || cat == Token::integer
             || cat == Token::real || cat == Token::ch) {
@@ -225,6 +229,7 @@ void Parser::exp_bhv() {
         if(opcmp()) {//是运算符或操作数进语义栈
             --synp;
             sem_stack[semp++] = tk;
+            returnToken = tk;//记录最后一个操作数,用于生成没有表达式的情况
             tk = scanner.next();
         } else if(syn_stack[synp] == LF || syn_stack[synp] == RT) {
             --synp;
@@ -252,6 +257,7 @@ void Parser::exp_bhv() {
             qt.setTarget(target);
             quaterList.insert(qt);//插入四元式序列
             sem_stack[semp++] = target;//结果单元压语义栈
+            ++count;//四元式计数增加
         }
     }
 }
@@ -262,13 +268,25 @@ Token Parser::expression() {
         生成临时变量要写入符号表
 */
     //初始化语法语义栈
-    synp = 0;
-    semp = 0;
+    synp = semp = count = 0;
+    returnToken = Token();
     syn_stack[0] = E;
     while(synp >= 0) {
+        auto idOrConst = [&t = tk]()->bool {//判断是不是id或者常数
+            Token::Categories cat = t.getCategory();
+            if(cat == Token::id || cat == Token::real || cat == Token::integer
+                    || cat == Token::ch) 
+                return true;
+            return false;
+        };
+        if(idOrConst()) returnToken = tk;
+        
         exp_bhv();
     }
     //把表达式结果四元式赋值给
-    Quaternary qt = quaterList.get(quaterList.size() - 1);
-    return qt.getTarget();
+    if(count != 0) {
+        Quaternary qt = quaterList.get(quaterList.size() - 1);
+        returnToken = qt.getTarget();
+    }
+    return returnToken;
 }
