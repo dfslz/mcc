@@ -74,6 +74,7 @@ void Parser::sentence() {
     }
 
     content();
+    tk = scanner.next();//防止分号被重复读取
 
     if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "}") {
         //主程序未结束,继续生成句子
@@ -98,7 +99,7 @@ void Parser::content() {
                 int typePosition = typeList.find(keywordList.get(type.getOffset()));
                 if(typePosition != -1) synbl.setType(tk.getOffset(), typePosition);
                 //error: 未定义的类型
-                else err(6), printToken(type);
+                else err(6);
             }
         }
         target = tk;
@@ -132,7 +133,7 @@ void Parser::content() {
 
     //句子结束,清空全局变量
     type = target = Token();
-    tk = scanner.next();
+    //tk = scanner.next();
 }
 
 /* 下面开始是表达式文法的解析内容
