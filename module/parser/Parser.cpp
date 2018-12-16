@@ -10,6 +10,7 @@ bool Parser::parse() {
     std::string functionName;
     if(tk.getCategory() != Token::keyword) {
         //error:函数没有返回值
+        err(0);
         ok = false;
     } else {
         //记录函数返回值类型
@@ -20,6 +21,7 @@ bool Parser::parse() {
     
     if(tk.getCategory() != Token::id) {
         //error: 函数名不正确
+        err(1);
         ok = false;
     } else {
         //记录函数名
@@ -30,7 +32,8 @@ bool Parser::parse() {
     tk = scanner.next();
 
     if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "{") {
-        //error:函数没有以大括号结尾
+        //error:函数没有以大括号开头
+        err(2);
         ok = false;
     } else {
         //生成开头四元式 (functionName, null, null, null)
@@ -47,6 +50,7 @@ bool Parser::parse() {
 
     if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "}") {
         //error:函数没有以大括号结尾
+        err(3);
         ok = false;
     } else {
         //生成结尾四元式 (endFunction, null, null, null)
@@ -80,18 +84,21 @@ void Parser::sentence() {
 void Parser::content() {
     if(tk.getCategory() != Token::id) {
         //error: 变量名错误
+        err(4);
         ok = false;
     } else {
         //检查id类型和重复定义
         if(type.getCategory() != Token::null) {//变量定义,检查是否重复定义过
             if(synbl.getCategory(tk.getOffset()) != SymbolList::null) {//变量已经定义过了
                 //error:重复定义变量
+                err(5);
                 ok = false;
             } else {//定义变量
                 synbl.setCategory(tk.getOffset(), SymbolList::various);//设置为变量类型
                 int typePosition = typeList.find(keywordList.get(type.getOffset()));
                 if(typePosition != -1) synbl.setType(tk.getOffset(), typePosition);
                 //error: 未定义的类型
+                else err(6), printToken(type);
             }
         }
         target = tk;
@@ -101,6 +108,7 @@ void Parser::content() {
 
     if(tk.getCategory() != Token::symbol) {
         //error: 没有操作符
+        err(7);
         ok = false;
     } else if(opList.get(tk.getOffset()) == "=") {
         //解析表达式
@@ -118,6 +126,7 @@ void Parser::content() {
         content();
     } else if(opList.get(tk.getOffset()) != ";") {
         //error:不能识别的符号
+        err(8);
         ok = false;
     }
 
@@ -187,6 +196,7 @@ void Parser::exp_bhv() {
         else if(tk.getCategory() != Token::symbol) {
             ok = false;
             //error: incorrect symbol
+            err(9);
         } else {
             //lambda表达式判断是否是当前符号
             auto symcmp = [&t = tk](std::string s) -> bool { return s == opList.get(t.getOffset()); };
@@ -197,8 +207,8 @@ void Parser::exp_bhv() {
             else if(symcmp("/")) code = 4;
             else if(symcmp("(")) code = 5;
             else if(symcmp(")")) code = 6;
-            else if(symcmp(";")) code = 7;
-            else ok = false;
+            else if(symcmp(";") || symcmp(",")) code = 7;
+            else ok = false, err(10);
             //else error:非法符号
         }
         int order = syn_stack[synp];
@@ -209,6 +219,7 @@ void Parser::exp_bhv() {
             if(p == -1) {
                 o = false;
                 //error: 语法错误
+                err(11);
             } else {
                 for(int i = 5; i >= 0; --i) {
                     if(bhv[p][i] != null) {
@@ -280,7 +291,7 @@ Token Parser::expression() {
             return false;
         };
         if(idOrConst()) returnToken = tk;
-        
+
         exp_bhv();
     }
     //把表达式结果四元式赋值给

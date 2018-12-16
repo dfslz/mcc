@@ -1,7 +1,7 @@
 #include "TypeList.h"
 
 int TypeList::_size = 3;
-TypeList::data TypeList::list[TypeList::_listMax] = {};
+//TypeList::data TypeList::list[TypeList::_listMax] = {};
 
 TypeList::TypeList() {
     setType(0, "int"); setOffset(0, 4);

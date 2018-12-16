@@ -4,6 +4,7 @@
 #include "Common.h"
 #include "Scanner.h"
 #include "Tool.h"
+#include "Error.h"
 
 class Parser {
 public:

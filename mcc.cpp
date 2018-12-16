@@ -21,8 +21,8 @@ int main(int argc, char** argv) {
         return 0;
     }
 
-    parser.parse();
-    printQuaterList();
+    int ok = parser.parse();
+    if(ok) printQuaterList();
 
     fin.close();
     return 0;

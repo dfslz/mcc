@@ -24,7 +24,7 @@ private:
         std::string _type;
         int _offset;
     };
-    static data list[ _listMax ];
+    data list[ _listMax ];
 };
 
 #endif
