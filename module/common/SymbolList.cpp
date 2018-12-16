@@ -60,3 +60,7 @@ SymbolList::Categories SymbolList::getCategory(int position) {
 bool SymbolList::getActivity(int position) {
     return list[position]._activity;
 }
+
+int SymbolList::size() {
+    return _position;
+}

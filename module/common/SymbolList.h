@@ -25,6 +25,7 @@ public:
     int getType(int position);
     Categories getCategory(int position);
     bool getActivity(int position);
+    int size();
 
 private:
     const static int _listMax = 1e5;//符号表大小
