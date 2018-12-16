@@ -11,12 +11,18 @@ public:
     int size();
     int insert(T value);
     int find(T value);
+    void setSize(int size);
     
 private:
     const static int listMax = 1e5;
     int _size;
     T list[ listMax ];
 };
+
+template<class T>
+void ConstantList<T>::setSize(int size) {
+    _size = size;
+}
 
 template<class T>
 void ConstantList<T>::set(int position, T value) {
