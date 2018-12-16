@@ -25,7 +25,7 @@ extern ConstantList<std::string> strList;
 extern SymbolList synbl;
 
 //类型表
-extern TypeList typelist;
+extern TypeList typeList;
 
 //关键字表
 extern ConstantList<std::string> keywordList;

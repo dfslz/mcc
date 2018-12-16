@@ -6,7 +6,7 @@
 class SymbolList {
 public:
     enum Categories {
-        label, various
+        label, various, function, null
     };
 
     //setter
@@ -32,6 +32,7 @@ private:
 
     //存储结构体
     struct data{
+        data() { _category = null; }
         std::string _name;
         int _type;
         Categories _category;

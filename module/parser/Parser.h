@@ -3,18 +3,21 @@
 
 #include "Common.h"
 #include "Scanner.h"
+#include "Tool.h"
 
 class Parser {
 public:
-    Parser(); 
     bool parse();//分析一个句子,返回是否合法并将合法句子生成四元式
 
 private:
-    Token tk;
+    Token tk, type, target;
+    std::string option;
     bool ok;
     void sentence();
-    void expression();
+    Token expression();
     void content();
+    void exp_bhv();
+    bool isConstantOrIdentify(Token::Categories cat);
 };
 
 extern Parser parser;

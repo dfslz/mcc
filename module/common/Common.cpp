@@ -13,7 +13,7 @@ ConstantList<std::string> strList;
 SymbolList synbl;
 
 //类型表
-TypeList typelist;
+TypeList typeList;
 
 //关键字表
 const int kwd_num = 5;

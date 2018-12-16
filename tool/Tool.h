@@ -4,6 +4,7 @@
 #include "Common.h"
 
 void printToken(Token& tk);
-int getLength(TypeList::TypeValue type);
+int getLength(std::string type);
+void printQuaterList();
 
 #endif
