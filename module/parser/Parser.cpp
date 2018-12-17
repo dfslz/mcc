@@ -65,7 +65,14 @@ bool Parser::parse() {
 }
 
 void Parser::sentence() {
-    if(tk.getCategory() == Token::keyword) {
+    auto checkType = [&token = tk]()->bool {//检查是不是类型名
+        if(token.getCategory() == Token::keyword) {
+            std::string s = keywordList.get(token.getOffset());
+            if(s == "int" || s == "float" || s == "char") return true;
+        }
+        return false;
+    };
+    if(checkType()) {//检查是不是类型名
         //记录type
         type = tk;
         tk = scanner.next();
@@ -101,8 +108,8 @@ void Parser::content() {
                 //error: 未定义的类型
                 else err(6);
             }
-        } else {//使用变量,需要判断是否定义过
-            if(synbl.getCategory(tk.getOffset()) != SymbolList::various) {
+        } else {//使用变量，应当判断是否定义过
+            if(synbl.getCategory(tk.getOffset()) != SymbolList::various) {//未定义的变量
                 err(12);
                 ok = false;
             }
@@ -117,17 +124,17 @@ void Parser::content() {
         err(7);
         ok = false;
     } else if(opList.get(tk.getOffset()) == "=") {
-        //解析表达式
         tk = scanner.next();
 
         //生成赋值四元式
         Quaternary qt;
         qt.setOption("=");
-        qt.setFirst(expression());
+        qt.setFirst(expression());//表达式解析在这里
         qt.setSecond(Token());
         qt.setTarget(target);
         quaterList.insert(qt);
-    } else if(opList.get(tk.getOffset()) == ",") {
+    } 
+    if(opList.get(tk.getOffset()) == ",") {
         tk = scanner.next();
         content();
     } else if(opList.get(tk.getOffset()) != ";") {
@@ -188,9 +195,15 @@ int count = 0;
 Token returnToken;
 
 bool Parser::isConstantOrIdentify(Token::Categories cat) {
-    if(cat == Token::id || cat == Token::integer
-            || cat == Token::real || cat == Token::ch) {
+    if(cat == Token::integer || cat == Token::real || cat == Token::ch) {
         return true;
+    } else if(cat == Token::id) {
+        if(synbl.getCategory(tk.getOffset()) != SymbolList::various) {
+            ok = false;
+            std::cout << tk.getOffset() << std::endl;
+            err(12);//使用了未定义的变量
+        }
+        return true;//为了不触发表达式非法的错误返回正确
     }
     return false;
 }
