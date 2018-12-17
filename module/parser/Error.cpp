@@ -15,9 +15,11 @@ string errList[] = {
     "8.不能识别的符号",
     "9.不是操作符",
     "10.非法符号",
-    "11.语法错误"
+    "11.语法错误",
+    "12.使用了未定义的变量"
 };
 
 void err(int code) {
-    cout << errList[code] << endl;
+    if(code < 13 && code >= 0) cout << errList[code] << endl;
+    else cout << "未定义的错误类型" << endl;
 }

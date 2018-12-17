@@ -101,6 +101,11 @@ void Parser::content() {
                 //error: 未定义的类型
                 else err(6);
             }
+        } else {//使用变量,需要判断是否定义过
+            if(synbl.getCategory(tk.getOffset()) != SymbolList::various) {
+                err(12);
+                ok = false;
+            }
         }
         target = tk;
     }
