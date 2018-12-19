@@ -96,7 +96,7 @@ void Parser::sentence() {
 
 void Parser::content() {
     if(tk.getCategory() != Token::id) {
-        //error: 变量名错误
+        printToken(tk);
         err(4);
         ok = false;
     } else {
@@ -232,7 +232,7 @@ void Parser::exp_bhv() {
             else if(symcmp("(")) code = 5;
             else if(symcmp(")")) code = 6;
             else if(symcmp(";") || symcmp(",")) code = 7;
-            else ok = false, err(10);
+            else ok = false, printToken(tk), err(10);
             //else error:非法符号
         }
         int order = syn_stack[synp];
@@ -327,7 +327,7 @@ void Parser::jmp() {
             return;
         } else if(cat == Token::id) {//id检查是否定义过
             if(synbl.getCategory(t.getOffset()) == SymbolList::various) return;
-            else err(4);
+            else printToken(t),err(4);
         }
         return;
     };
@@ -349,7 +349,7 @@ void Parser::jmp() {
 
     idOrConst();//第二操作数
     snd = tk;
-    //TODO:生成比较四元式和if开头四元式
+
     Quaternary qt;
     qt.setOption(opList.get(cmpOpt.getOffset()));
     qt.setFirst(fst);
@@ -357,7 +357,7 @@ void Parser::jmp() {
     qt.setTarget(getTarget());
     quaterList.insert(qt);//比较四元式
 
-    qt.setFirst(qt.getTarget());
+    qt.setFirst(quaterList.get(quaterList.size() - 1).getTarget());
     qt.setSecond(Token());
     qt.setTarget(Token());
     qt.setOption("if");
@@ -399,6 +399,7 @@ void Parser::jmp() {
         } else if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "{") {
             printToken(tk);
             err(14);
+        } else {
             tk = scanner.next();
             sentence();//else语句的内部语句块
             if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "}") {

@@ -19,6 +19,7 @@ private:
     void content();
     void exp_bhv();
     void jmp();
+    void whloop();
     bool isConstantOrIdentify(Token::Categories cat);
     Token getTarget();
 };
