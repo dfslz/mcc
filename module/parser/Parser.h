@@ -18,7 +18,9 @@ private:
     Token expression();
     void content();
     void exp_bhv();
+    void jmp();
     bool isConstantOrIdentify(Token::Categories cat);
+    Token getTarget();
 };
 
 extern Parser parser;

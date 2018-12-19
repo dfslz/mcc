@@ -2,7 +2,7 @@
 
 //初始化静态变量
 int SymbolList::_position = 0;
-SymbolList::data SymbolList::list[ SymbolList::_listMax ] = {};
+//SymbolList::data SymbolList::list[ SymbolList::_listMax ] = {};
 
 void SymbolList::setName(int position, std::string name) {
     list[position]._name = name;

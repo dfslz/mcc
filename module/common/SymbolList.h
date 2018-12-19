@@ -40,7 +40,7 @@ private:
         int _offset;
         bool _activity;
     };
-    static data list[ _listMax ];
+    data list[ _listMax ];
 };
 
 #endif

@@ -80,8 +80,13 @@ void Parser::sentence() {
         type.setCategory(Token::null);
     }
 
-    content();
-    tk = scanner.next();//防止分号被重复读取
+    if(tk.getCategory() == Token::keyword && keywordList.get(tk.getOffset()) == "if") {
+        tk = scanner.next();
+        jmp();
+    } else {
+        content();
+        tk = scanner.next();//防止分号被重复读取
+    }
 
     if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "}") {
         //主程序未结束,继续生成句子
@@ -272,17 +277,6 @@ void Parser::exp_bhv() {
             qt.setOption(opList.get(sem_stack[--semp].getOffset()));
             qt.setFirst(sem_stack[--semp]);
 
-            auto getTarget = []()->Token {//生成临时变量存放结果单元,并将临时变量写入符号表
-                Token temp;
-                temp.setCategory(Token::id);
-                std::string name = "@t";
-                static int a = 0;
-                int pos = synbl.insert(name + std::to_string(a++));
-                temp.setOffset(pos);
-                synbl.setCategory(pos, SymbolList::various);
-                //TODO: 设置类型,需要向上转换,比如int遇到float转换成float
-                return temp;
-            };
             Token target = getTarget();
             qt.setTarget(target);
             quaterList.insert(qt);//插入四元式序列
@@ -293,10 +287,6 @@ void Parser::exp_bhv() {
 }
 
 Token Parser::expression() {
-/*
-    TODO: 生成表达式四元式,并将最终结果变量放入first全局变量中
-        生成临时变量要写入符号表
-*/
     //初始化语法语义栈
     synp = semp = count = 0;
     returnToken = Token();
@@ -320,3 +310,116 @@ Token Parser::expression() {
     }
     return returnToken;
 }
+
+//下面开始是if语句的语法语义解析部分
+void Parser::jmp() {
+    Token fst, snd;//用于记录第一第二操作数
+    Token cmpOpt;//比较运算符
+
+    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "(") {
+        printToken(tk);
+        err(13);
+    }
+    tk = scanner.next();
+    auto idOrConst = [&t = tk]() {//判断是不是常数或者标识符,对标识符检查是否定义过
+        Token::Categories cat = t.getCategory();
+        if(cat == Token::integer || cat == Token::real) {
+            return;
+        } else if(cat == Token::id) {//id检查是否定义过
+            if(synbl.getCategory(t.getOffset()) == SymbolList::various) return;
+            else err(4);
+        }
+        return;
+    };
+
+    idOrConst();//非法则已经报错并结束程序
+    fst = tk;
+    tk = scanner.next();
+
+    auto isCmp = [&t = tk]() {//比较运算符
+        Token::Categories cat = t.getCategory();
+        if(cat != Token::symbol) err(9);
+        std::string s = opList.get(t.getOffset());
+        if(s != ">" && s != ">=" && s != "==" && s != "<=" && s != "<") err(10);
+    };
+    
+    isCmp();
+    cmpOpt = tk;
+    tk = scanner.next();
+
+    idOrConst();//第二操作数
+    snd = tk;
+    //TODO:生成比较四元式和if开头四元式
+    Quaternary qt;
+    qt.setOption(opList.get(cmpOpt.getOffset()));
+    qt.setFirst(fst);
+    qt.setSecond(snd);
+    qt.setTarget(getTarget());
+    quaterList.insert(qt);//比较四元式
+
+    qt.setFirst(qt.getTarget());
+    qt.setSecond(Token());
+    qt.setTarget(Token());
+    qt.setOption("if");
+    quaterList.insert(qt);//if开头四元式
+
+    tk = scanner.next();
+
+    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != ")") {
+        printToken(tk);
+        err(13);
+    }
+
+    tk = scanner.next();
+
+    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "{") {
+        err(14);
+    }
+
+    tk = scanner.next();
+    sentence();//内部语句块
+
+    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "}") {
+        err(14);
+    }
+
+    tk = scanner.next();
+
+    qt.setOption("el");
+    qt.setFirst(Token());
+    qt.setSecond(Token());
+    qt.setTarget(Token());
+    quaterList.insert(qt);
+
+    if(tk.getCategory() == Token::keyword && keywordList.get(tk.getOffset()) == "else") {
+        tk = scanner.next();
+        if(tk.getCategory() == Token::keyword && keywordList.get(tk.getOffset()) == "if") {
+            tk = scanner.next();
+            jmp();//递归if语句
+        } else if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "{") {
+            printToken(tk);
+            err(14);
+            tk = scanner.next();
+            sentence();//else语句的内部语句块
+            if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "}") {
+                printToken(tk);
+                err(14);
+            }
+            tk = scanner.next();
+        }
+    }
+    qt.setOption("ei");
+    quaterList.insert(qt);
+}
+
+Token Parser::getTarget() {//生成临时变量存放结果单元,并将临时变量写入符号表
+    Token temp;
+    temp.setCategory(Token::id);
+    std::string name = "@t";
+    static int a = 0;
+    int pos = synbl.insert(name + std::to_string(a++));
+    temp.setOffset(pos);
+    synbl.setCategory(pos, SymbolList::various);
+    //TODO: 设置类型,需要向上转换,比如int遇到float转换成float
+    return temp;
+};
