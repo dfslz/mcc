@@ -83,6 +83,9 @@ void Parser::sentence() {
     if(tk.getCategory() == Token::keyword && keywordList.get(tk.getOffset()) == "if") {
         tk = scanner.next();
         jmp();
+    } else if(tk.getCategory() == Token::keyword && keywordList.get(tk.getOffset()) == "while") {
+        tk = scanner.next();
+        whloop();
     } else {
         content();
         tk = scanner.next();//防止分号被重复读取
@@ -406,3 +409,68 @@ Token Parser::getTarget() {//生成临时变量存放结果单元,并将临时�
     //TODO: 设置类型,需要向上转换,比如int遇到float转换成float
     return temp;
 };
+
+void Parser::whloop() {
+    Quaternary qt;
+    qt.setOption("wh");
+    quaterList.insert(qt);//生成开头四元式
+
+    Token fst, snd;//用于记录第一第二操作数
+    Token cmpOpt;//比较运算符
+
+    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "(") {
+        printToken(tk);
+        err(15);
+    }
+
+    tk = scanner.next();
+    expression();
+    fst = count == 0? returnToken : quaterList.get(quaterList.size()-1).getTarget();
+
+    auto isCmp = [&t = tk]() {//比较运算符
+        Token::Categories cat = t.getCategory();
+        if(cat != Token::symbol) printToken(t),err(9);
+        std::string s = opList.get(t.getOffset());
+        if(s != ">" && s != ">=" && s != "==" && s != "<=" && s != "<") err(10);
+    };
+    
+    isCmp();
+    cmpOpt = tk;
+
+    tk.setCategory(Token::symbol);
+    tk.setOffset(opList.find("("));
+    expression();
+    snd = count == 0 ? returnToken : quaterList.get(quaterList.size()-1).getTarget();
+
+    qt.setOption(opList.get(cmpOpt.getOffset()));
+    qt.setFirst(fst);
+    qt.setSecond(snd);
+    qt.setTarget(getTarget());
+    quaterList.insert(qt);//比较四元式生成完毕
+
+    //条件判断四元式,和if一致
+    qt.setOption("do");
+    qt.setFirst(qt.getTarget());
+    qt.setSecond(Token());
+    qt.setTarget(Token());
+    quaterList.insert(qt);//插入条件判断四元式
+
+    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "{") {
+        printToken(tk);
+        err(16);
+    }
+    tk = scanner.next();
+
+    sentence();//块内语句
+
+    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "}") {
+        printToken(tk);
+        err(16);
+    }
+    qt.setOption("we");
+    qt.setFirst(Token());
+    qt.setSecond(Token());
+    qt.setTarget(Token());
+    quaterList.insert(qt);//生成结尾四元式
+    tk = scanner.next();
+}

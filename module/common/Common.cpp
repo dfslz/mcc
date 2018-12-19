@@ -16,7 +16,7 @@ SymbolList synbl;
 TypeList typeList;
 
 //关键字表
-const int kwd_num = 7;
+const int kwd_num = 8;
 std::string kwd[kwd_num] = {
     "int",
     "float",
@@ -24,7 +24,8 @@ std::string kwd[kwd_num] = {
     "void",
     "string",
     "if",
-    "else"
+    "else",
+    "while"
 };
 ConstantList<std::string> keywordList(kwd_num, kwd);
 

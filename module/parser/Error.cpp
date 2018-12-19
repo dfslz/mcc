@@ -19,11 +19,13 @@ string errList[] = {
     "11.语法错误",
     "12.使用了未定义的变量",
     "13.if小括号不正确",
-    "14.if后面大括号不正确"
+    "14.if后面大括号不正确",
+    "15.while后面小括号不正确",
+    "16.while后面的大括号有问题"
 };
 
 void err(int code) {
-    if(code < 15 && code >= 0) cout << errList[code] << endl;
+    if(code < 17 && code >= 0) cout << errList[code] << endl;
     else cout << "未定义的错误类型" << endl;
     exit(0);
 }
