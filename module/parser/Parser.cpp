@@ -219,7 +219,7 @@ void Parser::exp_bhv() {
         if(isConstantOrIdentify(tk.getCategory())) code = 0;
         else if(tk.getCategory() != Token::symbol) {
             ok = false;
-            //error: incorrect symbol
+            printToken(tk);
             err(9);
         } else {
             //lambda表达式判断是否是当前符号
@@ -231,7 +231,8 @@ void Parser::exp_bhv() {
             else if(symcmp("/")) code = 4;
             else if(symcmp("(")) code = 5;
             else if(symcmp(")")) code = 6;
-            else if(symcmp(";") || symcmp(",")) code = 7;
+            else if(symcmp(";") || symcmp(",") || symcmp(">") || symcmp("<")
+                || symcmp(">=") || symcmp("<=") || symcmp("==") || symcmp("{")) code = 7;
             else ok = false, printToken(tk), err(10);
             //else error:非法符号
         }
@@ -239,10 +240,10 @@ void Parser::exp_bhv() {
         --synp;//语法栈弹出
 
         //lambda表达式把推导式逆序压栈
-        auto pushsyn = [&o = ok](int p){
+        auto pushsyn = [&o = ok, &t = tk](int p){
             if(p == -1) {
                 o = false;
-                //error: 语法错误
+                printToken(t);
                 err(11);
             } else {
                 for(int i = 5; i >= 0; --i) {
@@ -320,35 +321,25 @@ void Parser::jmp() {
         printToken(tk);
         err(13);
     }
-    tk = scanner.next();
-    auto idOrConst = [&t = tk]() {//判断是不是常数或者标识符,对标识符检查是否定义过
-        Token::Categories cat = t.getCategory();
-        if(cat == Token::integer || cat == Token::real) {
-            return;
-        } else if(cat == Token::id) {//id检查是否定义过
-            if(synbl.getCategory(t.getOffset()) == SymbolList::various) return;
-            else printToken(t),err(4);
-        }
-        return;
-    };
 
-    idOrConst();//非法则已经报错并结束程序
-    fst = tk;
     tk = scanner.next();
+    expression();
+    fst = count == 0? returnToken : quaterList.get(quaterList.size()-1).getTarget();
 
     auto isCmp = [&t = tk]() {//比较运算符
         Token::Categories cat = t.getCategory();
-        if(cat != Token::symbol) err(9);
+        if(cat != Token::symbol) printToken(t),err(9);
         std::string s = opList.get(t.getOffset());
         if(s != ">" && s != ">=" && s != "==" && s != "<=" && s != "<") err(10);
     };
     
     isCmp();
     cmpOpt = tk;
-    tk = scanner.next();
 
-    idOrConst();//第二操作数
-    snd = tk;
+    tk.setCategory(Token::symbol);
+    tk.setOffset(opList.find("("));
+    expression();
+    snd = count == 0 ? returnToken : quaterList.get(quaterList.size()-1).getTarget();
 
     Quaternary qt;
     qt.setOption(opList.get(cmpOpt.getOffset()));
@@ -362,15 +353,6 @@ void Parser::jmp() {
     qt.setTarget(Token());
     qt.setOption("if");
     quaterList.insert(qt);//if开头四元式
-
-    tk = scanner.next();
-
-    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != ")") {
-        printToken(tk);
-        err(13);
-    }
-
-    tk = scanner.next();
 
     if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "{") {
         err(14);
