@@ -3,7 +3,7 @@
 
 #include "Common.h"
 
-void printToken(Token& tk);
+void printToken(Token tk);
 int getLength(std::string type);
 void printQuaterList();
 

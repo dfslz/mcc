@@ -105,10 +105,19 @@ void Parser::content() {
         //检查id类型和重复定义
         if(type.getCategory() != Token::null) {//变量定义,检查是否重复定义过
             if(synbl.getCategory(tk.getOffset()) != SymbolList::null) {//变量已经定义过了
-                //error:重复定义变量
-                printToken(tk);
-                err(5);
-            } else {//定义变量
+                //判断是否在同一个语句块中已经定义过了
+                if(synbl.getLocale() == (tk.getOffset() / synbl.getLevelSize())) {
+                    //error:重复定义变量
+                    printToken(tk);
+                    err(5);
+                } else {//局部变量,覆盖全局变量
+                    //重写token指向的单元
+                    tk.setOffset(synbl.insert(synbl.getName(tk.getOffset())));
+                    synbl.setCategory(tk.getOffset(), SymbolList::various);//设置为变量类型
+                    int typePosition = typeList.find(keywordList.get(type.getOffset()));
+                    if(typePosition != -1) synbl.setType(tk.getOffset(), typePosition);
+                }
+            } else {//未定义变量,直接记录定义值
                 synbl.setCategory(tk.getOffset(), SymbolList::various);//设置为变量类型
                 int typePosition = typeList.find(keywordList.get(type.getOffset()));
                 if(typePosition != -1) synbl.setType(tk.getOffset(), typePosition);
@@ -130,9 +139,9 @@ void Parser::content() {
         //error: 没有操作符
         printToken(tk);
         err(7);
-    } else if(opList.get(tk.getOffset()) == "=") {
+    } 
+    if(opList.get(tk.getOffset()) == "=") {
         tk = scanner.next();
-
         //生成赋值四元式
         Quaternary qt;
         qt.setOption("=");
@@ -140,8 +149,7 @@ void Parser::content() {
         qt.setSecond(Token());
         qt.setTarget(target);
         quaterList.insert(qt);
-    } 
-    if(opList.get(tk.getOffset()) == ",") {
+    } else if(opList.get(tk.getOffset()) == ",") {
         tk = scanner.next();
         content();
     } else if(opList.get(tk.getOffset()) != ";") {
@@ -152,7 +160,6 @@ void Parser::content() {
 
     //句子结束,清空全局变量
     type = target = Token();
-    //tk = scanner.next();
 }
 
 /* 下面开始是表达式文法的解析内容
@@ -232,7 +239,8 @@ void Parser::exp_bhv() {
             else if(symcmp("(")) code = 5;
             else if(symcmp(")")) code = 6;
             else if(symcmp(";") || symcmp(",") || symcmp(">") || symcmp("<")
-                || symcmp(">=") || symcmp("<=") || symcmp("==") || symcmp("{")) code = 7;
+                || symcmp(">=") || symcmp("<=") || symcmp("==") || symcmp("{")
+                || symcmp("!=")) code = 7;
             else printToken(tk), err(10);
             //else error:非法符号
         }
@@ -300,7 +308,7 @@ Token Parser::expression() {
                 return true;
             return false;
         };
-        if(idOrConst()) returnToken = tk;
+        if(idOrConst()) returnToken = tk;//, printToken(tk), std::cout << tk.getOffset() << std::endl;
 
         exp_bhv();
     }

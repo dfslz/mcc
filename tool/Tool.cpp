@@ -13,7 +13,7 @@ int getLength(string type) {
     return len;
 }
 
-void printToken(Token& tk) {
+void printToken(Token tk) {
     switch(tk.getCategory()) {
     case Token::keyword:
         cout << "keyword: " << keywordList.get(tk.getOffset()); break;
@@ -65,8 +65,8 @@ void printQuaterList() {
     for(int i = 0; i < quaterList.size(); ++i) {
         Quaternary qt = quaterList.get(i);
         cout << "( " <<  qt.getOption() << ", ";
-        printToken1(qt.getFirst()); cout << ", ";
-        printToken1(qt.getSecond()); cout << ", ";
+        printToken1(qt.getFirst()); cout << " " << ", ";
+        printToken1(qt.getSecond()); cout << " " <<  ", ";
         printToken1(qt.getTarget()); cout << " ";
         cout << ")" << endl;
     }

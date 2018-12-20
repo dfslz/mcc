@@ -112,3 +112,7 @@ int SymbolList::find(std::string name, int level) {
     }
     return -1;
 }
+
+int SymbolList::getLevelSize() {
+    return _level_size;
+}

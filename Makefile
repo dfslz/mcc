@@ -1,6 +1,6 @@
 #cc = g++
 cc = clang 
-CLANGFLAG = -lstdc++ 
+CLANGFLAG = -lstdc++ -std=c++11
 target = mcc
 main = mcc.o
 object = SymbolList.o Common.o Token.o TypeList.o Buffer.o Scanner.o Quaternary.o Parser.o Tool.o Error.o

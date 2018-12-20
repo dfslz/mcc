@@ -33,13 +33,14 @@ public:
     bool getActivity(int position);
     int getLocale();//得到当前块的level
     int getSuper(int level);//得到level的super块
+    int getLevelSize();
     int size();
 
 private:
     const static int _listMax = 1e5;//符号表大小
     static int _lv_size[_listMax / 99];//第i层中变量的数量
     static int _totalLevel;
-    const static int _level_size = 100;
+    const static int _level_size = 500;
 
     //存储结构体
     struct data{
