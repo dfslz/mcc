@@ -20,9 +20,10 @@ int main(int argc, char** argv) {
         cout << "not a valide input" << endl;
         return 0;
     }
+    synbl.pushLoacle();
 
-    int ok = parser.parse();
-    if(ok) printQuaterList();
+    parser.parse();
+    printQuaterList();
 
     fin.close();
     return 0;

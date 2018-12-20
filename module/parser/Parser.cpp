@@ -2,16 +2,14 @@
 
 Parser parser;
 
-bool Parser::parse() {
+void Parser::parse() {
     tk = scanner.next();
-    ok = true;
 
     Token returnType;//函数返回值类型
     std::string functionName;
     if(tk.getCategory() != Token::keyword) {
         //error:函数没有返回值
         err(0);
-        ok = false;
     } else {
         //记录函数返回值类型
         returnType = tk;
@@ -22,7 +20,6 @@ bool Parser::parse() {
     if(tk.getCategory() != Token::id) {
         //error: 函数名不正确
         err(1);
-        ok = false;
     } else {
         //记录函数名
         functionName = synbl.getName(tk.getOffset());
@@ -33,8 +30,8 @@ bool Parser::parse() {
 
     if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "{") {
         //error:函数没有以大括号开头
+        printToken(tk);
         err(2);
-        ok = false;
     } else {
         //生成开头四元式 (functionName, null, null, null)
         Quaternary qt;
@@ -44,14 +41,16 @@ bool Parser::parse() {
         qt.setTarget(Token());
         quaterList.insert(qt);
     }
+    //进入函数块
+    synbl.pushLoacle();
 
     tk = scanner.next();
     sentence();
 
     if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "}") {
         //error:函数没有以大括号结尾
+        printToken(tk);
         err(3);
-        ok = false;
     } else {
         //生成结尾四元式 (endFunction, null, null, null)
         Quaternary qt;
@@ -61,7 +60,8 @@ bool Parser::parse() {
         qt.setTarget(Token());
         quaterList.insert(qt);
     }
-    return ok;
+    //函数块结束
+    synbl.popLocale();
 }
 
 void Parser::sentence() {
@@ -101,25 +101,24 @@ void Parser::content() {
     if(tk.getCategory() != Token::id) {
         printToken(tk);
         err(4);
-        ok = false;
     } else {
         //检查id类型和重复定义
         if(type.getCategory() != Token::null) {//变量定义,检查是否重复定义过
             if(synbl.getCategory(tk.getOffset()) != SymbolList::null) {//变量已经定义过了
                 //error:重复定义变量
+                printToken(tk);
                 err(5);
-                ok = false;
             } else {//定义变量
                 synbl.setCategory(tk.getOffset(), SymbolList::various);//设置为变量类型
                 int typePosition = typeList.find(keywordList.get(type.getOffset()));
                 if(typePosition != -1) synbl.setType(tk.getOffset(), typePosition);
                 //error: 未定义的类型
-                else err(6);
+                else printToken(tk),err(6);
             }
         } else {//使用变量，应当判断是否定义过
             if(synbl.getCategory(tk.getOffset()) != SymbolList::various) {//未定义的变量
+                printToken(tk);
                 err(12);
-                ok = false;
             }
         }
         target = tk;
@@ -129,8 +128,8 @@ void Parser::content() {
 
     if(tk.getCategory() != Token::symbol) {
         //error: 没有操作符
+        printToken(tk);
         err(7);
-        ok = false;
     } else if(opList.get(tk.getOffset()) == "=") {
         tk = scanner.next();
 
@@ -147,8 +146,8 @@ void Parser::content() {
         content();
     } else if(opList.get(tk.getOffset()) != ";") {
         //error:不能识别的符号
+        printToken(tk);
         err(8);
-        ok = false;
     }
 
     //句子结束,清空全局变量
@@ -207,8 +206,7 @@ bool Parser::isConstantOrIdentify(Token::Categories cat) {
         return true;
     } else if(cat == Token::id) {
         if(synbl.getCategory(tk.getOffset()) != SymbolList::various) {
-            ok = false;
-            std::cout << tk.getOffset() << std::endl;
+            printToken(tk);
             err(12);//使用了未定义的变量
         }
         return true;//为了不触发表达式非法的错误返回正确
@@ -221,7 +219,6 @@ void Parser::exp_bhv() {
         int code = -1;
         if(isConstantOrIdentify(tk.getCategory())) code = 0;
         else if(tk.getCategory() != Token::symbol) {
-            ok = false;
             printToken(tk);
             err(9);
         } else {
@@ -236,7 +233,7 @@ void Parser::exp_bhv() {
             else if(symcmp(")")) code = 6;
             else if(symcmp(";") || symcmp(",") || symcmp(">") || symcmp("<")
                 || symcmp(">=") || symcmp("<=") || symcmp("==") || symcmp("{")) code = 7;
-            else ok = false, printToken(tk), err(10);
+            else printToken(tk), err(10);
             //else error:非法符号
         }
         int order = syn_stack[synp];
@@ -317,6 +314,9 @@ Token Parser::expression() {
 
 //下面开始是if语句的语法语义解析部分
 void Parser::jmp() {
+    //开始if语句块
+    synbl.pushLoacle();
+
     Token fst, snd;//用于记录第一第二操作数
     Token cmpOpt;//比较运算符
 
@@ -333,7 +333,7 @@ void Parser::jmp() {
         Token::Categories cat = t.getCategory();
         if(cat != Token::symbol) printToken(t),err(9);
         std::string s = opList.get(t.getOffset());
-        if(s != ">" && s != ">=" && s != "==" && s != "<=" && s != "<") err(10);
+        if(s != ">" && s != ">=" && s != "==" && s != "<=" && s != "<") printToken(t),err(10);
     };
     
     isCmp();
@@ -358,6 +358,7 @@ void Parser::jmp() {
     quaterList.insert(qt);//if开头四元式
 
     if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "{") {
+        printToken(tk);
         err(14);
     }
 
@@ -365,6 +366,7 @@ void Parser::jmp() {
     sentence();//内部语句块
 
     if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "}") {
+        printToken(tk);
         err(14);
     }
 
@@ -396,6 +398,8 @@ void Parser::jmp() {
     }
     qt.setOption("ei");
     quaterList.insert(qt);
+    //结束if语句块
+    synbl.popLocale();
 }
 
 Token Parser::getTarget() {//生成临时变量存放结果单元,并将临时变量写入符号表
@@ -411,6 +415,9 @@ Token Parser::getTarget() {//生成临时变量存放结果单元,并将临时�
 };
 
 void Parser::whloop() {
+    //开始while语句块
+    synbl.pushLoacle();
+
     Quaternary qt;
     qt.setOption("wh");
     quaterList.insert(qt);//生成开头四元式
@@ -431,7 +438,7 @@ void Parser::whloop() {
         Token::Categories cat = t.getCategory();
         if(cat != Token::symbol) printToken(t),err(9);
         std::string s = opList.get(t.getOffset());
-        if(s != ">" && s != ">=" && s != "==" && s != "<=" && s != "<") err(10);
+        if(s != ">" && s != ">=" && s != "==" && s != "<=" && s != "<") printToken(t),err(10);
     };
     
     isCmp();
@@ -473,4 +480,7 @@ void Parser::whloop() {
     qt.setTarget(Token());
     quaterList.insert(qt);//生成结尾四元式
     tk = scanner.next();
+
+    //结束while语句块
+    synbl.popLocale();
 }
