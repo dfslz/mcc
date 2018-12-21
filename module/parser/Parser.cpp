@@ -3,6 +3,7 @@
 Parser parser;
 
 void Parser::parse() {
+    sentence1 = false;
     tk = scanner.next();
 
     Token returnType;//函数返回值类型
@@ -80,10 +81,16 @@ void Parser::sentence() {
         type.setCategory(Token::null);
     }
 
-    if(tk.getCategory() == Token::keyword && keywordList.get(tk.getOffset()) == "if") {
+    if(sentence1) {//只允许变量的定义定义使用
+        content();
+        tk = scanner.next();
+    } else if(tk.getCategory() == Token::keyword && keywordList.get(tk.getOffset()) == "if") {
         tk = scanner.next();
         jmp();
     } else if(tk.getCategory() == Token::keyword && keywordList.get(tk.getOffset()) == "while") {
+        tk = scanner.next();
+        whloop();
+    } else if(tk.getCategory() == Token::keyword && keywordList.get(tk.getOffset()) == "for") {
         tk = scanner.next();
         whloop();
     } else {
@@ -91,7 +98,9 @@ void Parser::sentence() {
         tk = scanner.next();//防止分号被重复读取
     }
 
-    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "}") {
+    if(sentence1) {//sentence1不允许递归拓展
+        sentence1 = false;
+    } else if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "}") {
         //主程序未结束,继续生成句子
         sentence();
     }
@@ -341,7 +350,7 @@ void Parser::jmp() {
         Token::Categories cat = t.getCategory();
         if(cat != Token::symbol) printToken(t),err(9);
         std::string s = opList.get(t.getOffset());
-        if(s != ">" && s != ">=" && s != "==" && s != "<=" && s != "<") printToken(t),err(10);
+        if(s != ">" && s != ">=" && s != "==" && s != "<=" && s != "<" && s != "!=") printToken(t),err(10);
     };
     
     isCmp();
@@ -446,7 +455,7 @@ void Parser::whloop() {
         Token::Categories cat = t.getCategory();
         if(cat != Token::symbol) printToken(t),err(9);
         std::string s = opList.get(t.getOffset());
-        if(s != ">" && s != ">=" && s != "==" && s != "<=" && s != "<") printToken(t),err(10);
+        if(s != ">" && s != ">=" && s != "==" && s != "<=" && s != "<" && s != "!=") printToken(t),err(10);
     };
     
     isCmp();
@@ -491,4 +500,60 @@ void Parser::whloop() {
 
     //结束while语句块
     synbl.popLocale();
+}
+
+void Parser::forloop() {
+    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "(") {
+        printToken(tk);
+        err(17);
+    }
+    tk = scanner.next();
+
+    if(tk.getCategory() != Token::symbol) {//非空语句块
+        sentence1 = true;
+        sentence();//不允许递归拓展及分支循环的sentence
+
+        if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != ";") {
+            printToken(tk);
+            err(18);
+        }
+    } else if(opList.get(tk.getOffset()) != ";") {
+        printToken(tk);
+        err(18);
+    }
+    tk = scanner.next();
+
+    //下面部分和while语句一致,直接使用while语句的四元式格式
+    //生成开头四元式
+    Quaternary qt;
+    qt.setOption("wh");
+    quaterList.insert(qt);
+
+    //生成判断四元式序列
+    Token fst, snd, cmpOpt;
+    expression();
+    fst = count == 0? returnToken : quaterList.get(quaterList.size()-1).getTarget();
+
+    auto isCmp = [&t = tk]() {//比较运算符
+        Token::Categories cat = t.getCategory();
+        if(cat != Token::symbol) printToken(t),err(9);
+        std::string s = opList.get(t.getOffset());
+        if(s != ">" && s != ">=" && s != "==" && s != "<=" && s != "<" && s != "!=") printToken(t),err(10);
+    };
+    
+    isCmp();
+    cmpOpt = tk;
+
+    tk = scanner.next();//for不需要补括号
+    expression();
+    snd = count == 0 ? returnToken : quaterList.get(quaterList.size()-1).getTarget();
+
+    qt.setOption(opList.get(cmpOpt.getOffset()));
+    qt.setFirst(fst);
+    qt.setSecond(snd);
+    qt.setTarget(getTarget());
+    quaterList.insert(qt);//比较四元式生成完毕
+    
+    //if(tk.getCategory() != Token::)
+
 }

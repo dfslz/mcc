@@ -13,6 +13,8 @@ public:
 private:
     Token tk, type, target;
     std::string option;
+    bool sentence1;//用于决定sentence是否能够递归扩充
+
     bool ok;
     void sentence();
     Token expression();
@@ -20,6 +22,7 @@ private:
     void exp_bhv();
     void jmp();
     void whloop();
+    void forloop();
     bool isConstantOrIdentify(Token::Categories cat);
     Token getTarget();
 };

@@ -21,6 +21,9 @@ extern ConstantList<float> floatList;
 extern ConstantList<char> charList;
 extern ConstantList<std::string> strList;
 
+//长度表
+extern ConstantList<int> len;
+
 //符号表
 extern SymbolList synbl;
 

@@ -9,6 +9,9 @@ ConstantList<float> floatList;
 ConstantList<char> charList;
 ConstantList<std::string> strList;
 
+//长度表
+ConstantList<int> len;
+
 //符号表
 SymbolList synbl;
 
@@ -16,7 +19,7 @@ SymbolList synbl;
 TypeList typeList;
 
 //关键字表
-const int kwd_num = 8;
+const int kwd_num = 9;
 std::string kwd[kwd_num] = {
     "int",
     "float",
@@ -25,7 +28,8 @@ std::string kwd[kwd_num] = {
     "string",
     "if",
     "else",
-    "while"
+    "while",
+    "for"
 };
 ConstantList<std::string> keywordList(kwd_num, kwd);
 
