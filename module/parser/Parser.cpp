@@ -554,6 +554,6 @@ void Parser::forloop() {
     qt.setTarget(getTarget());
     quaterList.insert(qt);//比较四元式生成完毕
     
-    //if(tk.getCategory() != Token::)
+    if(tk.getCategory() != Token::symbol)
 
 }
