@@ -23,6 +23,7 @@ private:
     void jmp();
     void whloop();
     void forloop();
+    void dowhloop();
     bool isConstantOrIdentify(Token::Categories cat);
     Token getTarget();
 };

@@ -66,6 +66,7 @@ void Parser::parse() {
 }
 
 void Parser::sentence() {
+    if(Buffer::isFileEnd()) return;
     auto checkType = [&token = tk]()->bool {//检查是不是类型名
         if(token.getCategory() == Token::keyword) {
             std::string s = keywordList.get(token.getOffset());
@@ -83,7 +84,6 @@ void Parser::sentence() {
 
     if(sentence1) {//只允许变量的定义定义使用
         content();
-        tk = scanner.next();
     } else if(tk.getCategory() == Token::keyword && keywordList.get(tk.getOffset()) == "if") {
         tk = scanner.next();
         jmp();
@@ -92,13 +92,16 @@ void Parser::sentence() {
         whloop();
     } else if(tk.getCategory() == Token::keyword && keywordList.get(tk.getOffset()) == "for") {
         tk = scanner.next();
-        whloop();
+        forloop();
+    } else if(tk.getCategory() == Token::keyword && keywordList.get(tk.getOffset()) == "do") {
+        tk = scanner.next();
+        dowhloop();
     } else {
         content();
         tk = scanner.next();//防止分号被重复读取
     }
 
-    if(sentence1) {//sentence1不允许递归拓展
+    if(sentence1 || Buffer::isFileEnd()) {//sentence1不允许递归拓展
         sentence1 = false;
     } else if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "}") {
         //主程序未结束,继续生成句子
@@ -125,10 +128,12 @@ void Parser::content() {
                     synbl.setCategory(tk.getOffset(), SymbolList::various);//设置为变量类型
                     int typePosition = typeList.find(keywordList.get(type.getOffset()));
                     if(typePosition != -1) synbl.setType(tk.getOffset(), typePosition);
+                    synbl.setOffset(tk.getOffset(), typeList.getOffset(typePosition));
                 }
             } else {//未定义变量,直接记录定义值
                 synbl.setCategory(tk.getOffset(), SymbolList::various);//设置为变量类型
                 int typePosition = typeList.find(keywordList.get(type.getOffset()));
+                synbl.setOffset(tk.getOffset(), typeList.getOffset(typePosition));
                 if(typePosition != -1) synbl.setType(tk.getOffset(), typePosition);
                 //error: 未定义的类型
                 else printToken(tk),err(6);
@@ -503,6 +508,7 @@ void Parser::whloop() {
 }
 
 void Parser::forloop() {
+    synbl.pushLoacle();
     if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "(") {
         printToken(tk);
         err(17);
@@ -554,6 +560,155 @@ void Parser::forloop() {
     qt.setTarget(getTarget());
     quaterList.insert(qt);//比较四元式生成完毕
     
-    if(tk.getCategory() != Token::symbol)
+    //do四元式
+    qt.setOption("do");
+    qt.setFirst(quaterList.get(quaterList.size() - 1).getTarget());
+    qt.setSecond(Token());
+    qt.setTarget(Token());
+    quaterList.insert(qt);
+    
+    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != ";") {
+        printToken(tk);
+        err(18);
+    }
+    tk = scanner.next();
 
+    //这部分四元式需要记录,并移动到for循环结尾处
+    int cntSize = quaterList.size();//当前四元式大小
+    sentence1 = true;
+    sentence();
+    int endSize = quaterList.size();//结束时大小
+    Quaternary *tmpList = new Quaternary[endSize - cntSize];//复制这一段四元式
+    for(int i = cntSize; i < endSize; ++i) {
+        tmpList[i - cntSize] = quaterList.get(i);
+    }
+    quaterList.setSize(cntSize);//复位四元式位置
+
+    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != ";") {
+        printToken(tk);
+        err(18);
+    }
+
+    tk = scanner.next();
+    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != ")") {
+        printToken(tk);
+        err(20);
+    }
+
+    tk = scanner.next();
+    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "{") {
+        printToken(tk);
+        err(19);
+    }
+
+    tk = scanner.next();
+    sentence();//for循环内部语句块
+
+    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "}") {
+        printToken(tk);
+        err(19);
+    }
+    tk = scanner.next();
+    //复制结尾四元式过来
+    for(int i = 0; i < endSize - cntSize; ++i) {
+        quaterList.insert(tmpList[i]);
+    }
+
+    qt.setOption("we");
+    qt.setFirst(Token());
+    qt.setSecond(Token());
+    qt.setTarget(Token());
+    quaterList.insert(qt);
+    
+    synbl.popLocale();
+}
+
+void Parser::dowhloop() {
+    synbl.pushLoacle();//处理局部变量
+
+    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "{") {
+        printToken(tk);
+        err(21);
+    }
+    tk = scanner.next();
+    //生成开头的四元式,同样用while语句实现
+    Quaternary qt;
+    qt.setOption("=");
+    Token tmptk; tmptk.setCategory(Token::integer); tmptk.setOffset(intList.insert(1));
+    qt.setFirst(tmptk);
+    tmptk = getTarget();
+    qt.setTarget(tmptk);
+    quaterList.insert(qt);//循环控制变量外提,同时初始化为1,即必定执行一边
+    //while开头四元式
+    qt.setOption("wh");
+    qt.setFirst(Token());
+    qt.setTarget(Token());
+    quaterList.insert(qt);
+    //do四元式
+    qt.setOption("do");
+    qt.setFirst(tmptk);
+    quaterList.insert(qt);
+    
+    //内部语句块
+    sentence();
+
+    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "}") {
+        printToken(tk);
+        err(21);
+    }
+    tk = scanner.next();
+
+    if(tk.getCategory() != Token::keyword || keywordList.get(tk.getOffset()) != "while") {
+        printToken(tk);
+        err(22);
+    }
+    tk = scanner.next();
+
+    Token fst, snd;//用于记录第一第二操作数
+    Token cmpOpt;//比较运算符
+
+    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "(") {
+        printToken(tk);
+        err(15);
+    }
+
+    tk = scanner.next();
+    expression();
+    fst = count == 0? returnToken : quaterList.get(quaterList.size()-1).getTarget();
+
+    auto isCmp = [&t = tk]() {//比较运算符
+        Token::Categories cat = t.getCategory();
+        if(cat != Token::symbol) printToken(t),err(9);
+        std::string s = opList.get(t.getOffset());
+        if(s != ">" && s != ">=" && s != "==" && s != "<=" && s != "<" && s != "!=") printToken(t),err(10);
+    };
+    
+    isCmp();
+    cmpOpt = tk;
+
+    tk.setCategory(Token::symbol);
+    tk.setOffset(opList.find("("));
+    expression();
+    snd = count == 0 ? returnToken : quaterList.get(quaterList.size()-1).getTarget();
+
+    qt.setOption(opList.get(cmpOpt.getOffset()));
+    qt.setFirst(fst);
+    qt.setSecond(snd);
+    qt.setTarget(tmptk);
+    quaterList.insert(qt);//比较四元式生成完毕
+
+    //  结尾四元式
+    qt.setOption("we");
+    qt.setFirst(Token());
+    qt.setSecond(Token());
+    qt.setTarget(Token());
+    quaterList.insert(qt);
+
+    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != ";") {
+        printToken(tk);
+        err(23);
+    }
+    tk = scanner.next();
+
+    synbl.popLocale();
 }

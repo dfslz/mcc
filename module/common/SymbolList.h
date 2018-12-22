@@ -31,6 +31,7 @@ public:
     int getType(int position);
     Categories getCategory(int position);
     bool getActivity(int position);
+    int getOffset(int position);
     int getLocale();//得到当前块的level
     int getSuper(int level);//得到level的super块
     int getLevelSize();

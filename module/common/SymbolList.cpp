@@ -116,3 +116,7 @@ int SymbolList::find(std::string name, int level) {
 int SymbolList::getLevelSize() {
     return _level_size;
 }
+
+int SymbolList::getOffset(int position) {
+    return list[position]._offset;
+}

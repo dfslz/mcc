@@ -12,7 +12,6 @@ Token Scanner::next() {
 
     while(_state != stateEnd) {
         char ch = buffer.get();//只读当前字符,buffer指针不动
-        //std::cout << ch << " " << _state << " ";
         if(behavior(ch)) {//只有behavior()接收了字符才移动buffer指针
             buffer.next();
         }
