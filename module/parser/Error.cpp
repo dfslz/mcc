@@ -33,11 +33,13 @@ string errList[] = {
     "25.数组方括号不匹配",
     "26.数组变量名非法",
     "27.数组尾部缺少分号",
-    "28.数组下标必须为整形数"
+    "28.数组下标必须为整形数",
+    "29.数组初始化格式错误",
+    "30.缺少分号"
 };
 
 void err(int code) {
-    if(code < 29 && code >= 0) cout << errList[code] << endl;
+    if(code < 31 && code >= 0) cout << errList[code] << endl;
     else cout << "未定义的错误类型" << endl;
     exit(0);
 }

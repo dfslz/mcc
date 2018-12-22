@@ -27,6 +27,7 @@ private:
     void dowhloop();
     void array();
     void processArray();
+    void arrayInit(Token tmptk);
     bool isConstantOrIdentify(Token::Categories cat);
     Token getTarget(int type);
 };

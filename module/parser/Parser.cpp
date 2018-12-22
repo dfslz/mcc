@@ -99,6 +99,10 @@ void Parser::sentence() {
     } else {
         content();
         tk = scanner.next();//防止分号被重复读取
+        if(tk.getCategory() != Token::symbol || (opList.get(tk.getOffset()) != "}" && opList.get(tk.getOffset()) != ";")) {
+            printToken(tk);
+            err(30);
+        }
     }
 
     if(sentence1 || Buffer::isFileEnd()) {//sentence1不允许递归拓展
@@ -752,14 +756,17 @@ void Parser::array() {
         printToken(tk);
         err(26);
     }
-    //TODO: 设置synbl cat,type,分配内存
+    //设置synbl cat,type,分配内存
     synbl.setCategory(tk.getOffset(), SymbolList::array);
     synbl.setType(tk.getOffset(), typeList.find(tyn));
     synbl.setOffset(tk.getOffset(), synbl.placeVarious(typesize*arrayList.getLength(typeoffset)));
     
+    Token tmp = tk;
     tk = scanner.next();
-    if(tk.getCategory() == Token::symbol && opList.get(tk.getCategory()) == "=") {
+    if(tk.getCategory() == Token::symbol && opList.get(tk.getOffset()) == "=") {
         //生成对于赋值四元式
+        arrayInit(tmp);
+        tk = scanner.next();
     } else if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != ";") {
         printToken(tk);
         err(27);
@@ -795,5 +802,47 @@ void Parser::processArray() {//需要在紧接着的下一条scanner.next()前�
     if(tmptk.getCategory() != Token::symbol || opList.get(tmptk.getOffset()) != "]") {
         printToken(tmptk);
         err(25);
+    }
+}
+
+void Parser::arrayInit(Token tmptk) {
+    tk = scanner.next();
+    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "{") {
+        printToken(tk);
+        err(29);
+    }
+    
+    //tk = scanner.next();
+    int cnt = 0;
+    Token var = getTarget(0), co;
+    do {
+        //生成赋值四元式
+        Quaternary qt;
+        
+        //生成一个计数临时变量
+        co.setCategory(Token::integer);
+        co.setOffset(intList.insert(cnt++));
+
+        qt.setOption("=");
+        qt.setFirst(co);
+        qt.setTarget(var);//赋值给var
+        quaterList.insert(qt);
+
+        tmptk.setPosition(-var.getOffset());//生成带有position的token
+        
+        tk = scanner.next();
+        if(tk.getCategory() != Token::integer && tk.getCategory() != Token::real && tk.getCategory() != Token::ch) {
+            printToken(tk);
+            err(29);
+        }
+        qt.setFirst(tk);
+        qt.setTarget(tmptk);
+        quaterList.insert(qt);
+        tk = scanner.next();
+    } while(tk.getCategory() == Token::symbol && opList.get(tk.getOffset()) == ",");
+
+    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "}") {
+        printToken(tk);
+        err(29);
     }
 }
