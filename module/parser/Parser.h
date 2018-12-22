@@ -25,7 +25,7 @@ private:
     void forloop();
     void dowhloop();
     bool isConstantOrIdentify(Token::Categories cat);
-    Token getTarget();
+    Token getTarget(int type);
 };
 
 extern Parser parser;

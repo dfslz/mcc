@@ -4,6 +4,7 @@
 //初始化静态变量
 int SymbolList::_lv_size[] = {};
 int SymbolList::_totalLevel = 0;
+int SymbolList::_totalMemory = 0;
 
 void SymbolList::setName(int position, std::string name) {
     list[position]._name = name;
@@ -119,4 +120,9 @@ int SymbolList::getLevelSize() {
 
 int SymbolList::getOffset(int position) {
     return list[position]._offset;
+}
+
+int SymbolList::placeVarious(int size) {
+    _totalMemory += size;
+    return _totalMemory - size;
 }

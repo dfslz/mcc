@@ -24,3 +24,10 @@ bool Token::getActivity() {
     return _activity;
 }
 
+void Token::setPosition(int position) {
+    _position = position;
+}
+
+int Token::getPosition() {
+    return _position;
+}

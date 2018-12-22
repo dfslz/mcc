@@ -20,6 +20,7 @@ public:
     void setActivity(int position, bool activity);
     void pushLoacle();//生成一个新的局部变量块开始
     void popLocale();//一个局部变量块结束
+    int placeVarious(int size);
 
     //function
     int find(std::string name);//查找当前块及其冲突域中super块变量
@@ -42,6 +43,7 @@ private:
     static int _lv_size[_listMax / 99];//第i层中变量的数量
     static int _totalLevel;
     const static int _level_size = 500;
+    static int _totalMemory;
 
     //存储结构体
     struct data{

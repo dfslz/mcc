@@ -128,15 +128,16 @@ void Parser::content() {
                     synbl.setCategory(tk.getOffset(), SymbolList::various);//设置为变量类型
                     int typePosition = typeList.find(keywordList.get(type.getOffset()));
                     if(typePosition != -1) synbl.setType(tk.getOffset(), typePosition);
-                    synbl.setOffset(tk.getOffset(), typeList.getOffset(typePosition));
+                    else printToken(tk), err(6);
+                    synbl.setOffset(tk.getOffset(), synbl.placeVarious(typeList.getOffset(typePosition)));
                 }
             } else {//未定义变量,直接记录定义值
                 synbl.setCategory(tk.getOffset(), SymbolList::various);//设置为变量类型
                 int typePosition = typeList.find(keywordList.get(type.getOffset()));
-                synbl.setOffset(tk.getOffset(), typeList.getOffset(typePosition));
                 if(typePosition != -1) synbl.setType(tk.getOffset(), typePosition);
                 //error: 未定义的类型
                 else printToken(tk),err(6);
+                synbl.setOffset(tk.getOffset(), synbl.placeVarious(typeList.getOffset(typePosition)));
             }
         } else {//使用变量，应当判断是否定义过
             if(synbl.getCategory(tk.getOffset()) != SymbolList::various) {//未定义的变量
@@ -300,7 +301,7 @@ void Parser::exp_bhv() {
             qt.setOption(opList.get(sem_stack[--semp].getOffset()));
             qt.setFirst(sem_stack[--semp]);
 
-            Token target = getTarget();
+            Token target = getTarget(synbl.getType(qt.getFirst().getOffset()));
             qt.setTarget(target);
             quaterList.insert(qt);//插入四元式序列
             sem_stack[semp++] = target;//结果单元压语义栈
@@ -370,7 +371,7 @@ void Parser::jmp() {
     qt.setOption(opList.get(cmpOpt.getOffset()));
     qt.setFirst(fst);
     qt.setSecond(snd);
-    qt.setTarget(getTarget());
+    qt.setTarget(getTarget(synbl.getType(qt.getFirst().getOffset())));
     quaterList.insert(qt);//比较四元式
 
     qt.setFirst(quaterList.get(quaterList.size() - 1).getTarget());
@@ -424,14 +425,17 @@ void Parser::jmp() {
     synbl.popLocale();
 }
 
-Token Parser::getTarget() {//生成临时变量存放结果单元,并将临时变量写入符号表
+Token Parser::getTarget(int type) {//生成临时变量存放结果单元,并将临时变量写入符号表
     Token temp;
     temp.setCategory(Token::id);
     std::string name = "@t";
     static int a = 0;
     int pos = synbl.insert(name + std::to_string(a++));
     temp.setOffset(pos);
+
     synbl.setCategory(pos, SymbolList::various);
+    synbl.setType(pos, type);
+    synbl.setOffset(pos, synbl.placeVarious(typeList.getOffset(type)));
     //TODO: 设置类型,需要向上转换,比如int遇到float转换成float
     return temp;
 };
@@ -474,7 +478,7 @@ void Parser::whloop() {
     qt.setOption(opList.get(cmpOpt.getOffset()));
     qt.setFirst(fst);
     qt.setSecond(snd);
-    qt.setTarget(getTarget());
+    qt.setTarget(getTarget(synbl.getType(qt.getFirst().getOffset())));
     quaterList.insert(qt);//比较四元式生成完毕
 
     //条件判断四元式,和if一致
@@ -557,7 +561,7 @@ void Parser::forloop() {
     qt.setOption(opList.get(cmpOpt.getOffset()));
     qt.setFirst(fst);
     qt.setSecond(snd);
-    qt.setTarget(getTarget());
+    qt.setTarget(getTarget(synbl.getType(qt.getFirst().getOffset())));
     quaterList.insert(qt);//比较四元式生成完毕
     
     //do四元式
@@ -636,7 +640,7 @@ void Parser::dowhloop() {
     qt.setOption("=");
     Token tmptk; tmptk.setCategory(Token::integer); tmptk.setOffset(intList.insert(1));
     qt.setFirst(tmptk);
-    tmptk = getTarget();
+    tmptk = getTarget(synbl.getType(qt.getFirst().getOffset()));
     qt.setTarget(tmptk);
     quaterList.insert(qt);//循环控制变量外提,同时初始化为1,即必定执行一边
     //while开头四元式
