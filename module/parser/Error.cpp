@@ -28,11 +28,16 @@ string errList[] = {
     "20.for语句小括号不正确",
     "21.do-while后面大括号不正确",
     "22.do-while缺少while条件判断",
-    "23.do-while缺少结尾分号"
+    "23.do-while缺少结尾分号",
+    "24.数组大小不能为变量",
+    "25.数组方括号不匹配",
+    "26.数组变量名非法",
+    "27.数组尾部缺少分号",
+    "28.数组下标必须为整形数"
 };
 
 void err(int code) {
-    if(code < 24 && code >= 0) cout << errList[code] << endl;
+    if(code < 29 && code >= 0) cout << errList[code] << endl;
     else cout << "未定义的错误类型" << endl;
     exit(0);
 }

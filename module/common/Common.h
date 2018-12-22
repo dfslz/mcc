@@ -8,6 +8,7 @@
 #include "TypeList.h"
 #include "ConstantList.h"
 #include "Quaternary.h"
+#include "ArrayInformation.h"
 
 //目标文件输入流
 extern std::ifstream fin;
@@ -38,6 +39,9 @@ extern ConstantList<std::string> opList;
 
 //四元式序列
 extern ConstantList<Quaternary> quaterList;
+
+//数组信息表
+extern ArrayInformation arrayList;
 
 #endif
 

@@ -9,7 +9,7 @@
 class SymbolList {
 public:
     enum Categories {
-        label, various, function, null
+        label, various, function, null, array
     };
 
     //setter

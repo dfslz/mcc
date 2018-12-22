@@ -16,6 +16,7 @@ private:
     bool sentence1;//用于决定sentence是否能够递归扩充
 
     bool ok;
+
     void sentence();
     Token expression();
     void content();
@@ -24,6 +25,8 @@ private:
     void whloop();
     void forloop();
     void dowhloop();
+    void array();
+    void processArray();
     bool isConstantOrIdentify(Token::Categories cat);
     Token getTarget(int type);
 };

@@ -111,8 +111,13 @@ void Parser::sentence() {
 
 void Parser::content() {
     if(tk.getCategory() != Token::id) {
-        printToken(tk);
-        err(4);
+        if(tk.getCategory() == Token::symbol && opList.get(tk.getOffset()) == "[" && type.getCategory() != Token::null) {
+            array();
+            return;
+        } else {
+            printToken(tk);
+            err(4);
+        }
     } else {
         //检查id类型和重复定义
         if(type.getCategory() != Token::null) {//变量定义,检查是否重复定义过
@@ -140,7 +145,10 @@ void Parser::content() {
                 synbl.setOffset(tk.getOffset(), synbl.placeVarious(typeList.getOffset(typePosition)));
             }
         } else {//使用变量，应当判断是否定义过
-            if(synbl.getCategory(tk.getOffset()) != SymbolList::various) {//未定义的变量
+            processArray();
+            if(synbl.getCategory(tk.getOffset()) != SymbolList::various 
+                    && synbl.getCategory(tk.getOffset()) != SymbolList::array
+            ) {//未定义的变量
                 printToken(tk);
                 err(12);
             }
@@ -227,7 +235,9 @@ bool Parser::isConstantOrIdentify(Token::Categories cat) {
     if(cat == Token::integer || cat == Token::real || cat == Token::ch) {
         return true;
     } else if(cat == Token::id) {
-        if(synbl.getCategory(tk.getOffset()) != SymbolList::various) {
+        if(synbl.getCategory(tk.getOffset()) != SymbolList::various
+                && synbl.getCategory(tk.getOffset()) != SymbolList::array
+        ) {
             printToken(tk);
             err(12);//使用了未定义的变量
         }
@@ -290,9 +300,11 @@ void Parser::exp_bhv() {
             sem_stack[semp++] = tk;
             returnToken = tk;//记录最后一个操作数,用于生成没有表达式的情况
             tk = scanner.next();
+            processArray();
         } else if(syn_stack[synp] == LF || syn_stack[synp] == RT) {
             --synp;
             tk = scanner.next();
+            processArray();
         } else if(syn_stack[synp] == OK) {
             //生成四元式,并将临时变量写入符号表
             --synp;
@@ -312,6 +324,7 @@ void Parser::exp_bhv() {
 
 Token Parser::expression() {
     //初始化语法语义栈
+    processArray();
     synp = semp = count = 0;
     returnToken = Token();
     syn_stack[0] = E;
@@ -715,4 +728,72 @@ void Parser::dowhloop() {
     tk = scanner.next();
 
     synbl.popLocale();
+}
+
+void Parser::array() {
+    tk = scanner.next();
+    if(tk.getCategory() != Token::integer) {
+        printToken(tk);
+        err(24);
+    }
+    std::string tyn = keywordList.get(type.getOffset()) + std::to_string(intList.get(tk.getOffset()));//设置数组类型名
+    int typesize = typeList.getOffset(synbl.getType(type.getOffset()));//数组中一个单元的大小
+    int typeoffset = arrayList.insert(intList.get(tk.getOffset()), synbl.getType(type.getOffset()), typesize);//信息在数组信息表中的位置
+    typeList.insert(tyn, arrayList.insert(intList.get(tk.getOffset()), synbl.getType(type.getOffset()), typesize));//存入类型信息表
+
+    tk = scanner.next();
+    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "]") {
+        printToken(tk);
+        err(25);
+    }
+
+    tk = scanner.next();
+    if(tk.getCategory() != Token::id) {
+        printToken(tk);
+        err(26);
+    }
+    //TODO: 设置synbl cat,type,分配内存
+    synbl.setCategory(tk.getOffset(), SymbolList::array);
+    synbl.setType(tk.getOffset(), typeList.find(tyn));
+    synbl.setOffset(tk.getOffset(), synbl.placeVarious(typesize*arrayList.getLength(typeoffset)));
+    
+    tk = scanner.next();
+    if(tk.getCategory() == Token::symbol && opList.get(tk.getCategory()) == "=") {
+        //生成对于赋值四元式
+    } else if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != ";") {
+        printToken(tk);
+        err(27);
+    }
+}
+
+void Parser::processArray() {//需要在紧接着的下一条scanner.next()前判断是否已经读取
+    if(synbl.getCategory(tk.getOffset()) != SymbolList::array) return;//不是数组不处理
+    Token tmptk = scanner.next();
+    if(tmptk.getCategory() != Token::symbol || opList.get(tmptk.getOffset()) != "[") {
+        printToken(tmptk);
+        err(25);
+    }
+    tmptk = scanner.next();
+    
+    if(tmptk.getCategory() != Token::integer &&
+            (tmptk.getCategory() != Token::id || synbl.getType(tmptk.getOffset()) != typeList.find("int"))
+    ) {
+        printToken(tmptk);
+        err(28);
+    }
+    //TODO 处理下标写入变量四元式
+    if(tmptk.getCategory() == Token::integer) tk.setPosition(intList.get(tmptk.getOffset()));//注意是设置tk
+    else {//检查变量是否定义过,同时设置tk的position为变量在符号表中的相反数
+        if(synbl.getCategory(tmptk.getOffset()) == SymbolList::null) {//未定义
+            printToken(tmptk);
+            err(12);
+        }
+        tk.setPosition(-tmptk.getOffset());//变量设置为其在符号表中位置的相反数,用于和立即数区分
+    }
+    
+    tmptk = scanner.next();
+    if(tmptk.getCategory() != Token::symbol || opList.get(tmptk.getOffset()) != "]") {
+        printToken(tmptk);
+        err(25);
+    }
 }

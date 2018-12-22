@@ -6,7 +6,7 @@ public:
     enum Categories {
         keyword, id, integer, real, ch, str, symbol, null
     };
-    Token() { _offset = 0; _category = null; _activity = true; _position = 0; }
+    Token() { _offset = 0; _category = null; _activity = true; _position = -1; }
     
     //setter
     void setCategory(Categories category);

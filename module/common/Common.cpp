@@ -35,12 +35,15 @@ std::string kwd[kwd_num] = {
 ConstantList<std::string> keywordList(kwd_num, kwd);
 
 //界符和运算符表
-const int op_num = 17;
+const int op_num = 19;
 std::string opt[op_num] = {
     "+", "-", "*", "/", "=", "==",
-    ">", "<", ">=", "<=", "(", ")", "{", "}", ";", ",", "!="
+    ">", "<", ">=", "<=", "(", ")", "{", "}", ";", ",", "!=", "[", "]"
 };
 ConstantList<std::string> opList(op_num, opt);
 
 //四元式序列
 ConstantList<Quaternary> quaterList;
+
+//数组信息表
+ArrayInformation arrayList;
