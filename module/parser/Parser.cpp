@@ -99,10 +99,6 @@ void Parser::sentence() {
     } else {
         content();
         tk = scanner.next();//防止分号被重复读取
-        if(tk.getCategory() != Token::symbol || (opList.get(tk.getOffset()) != "}" && opList.get(tk.getOffset()) != ";")) {
-            printToken(tk);
-            err(30);
-        }
     }
 
     if(sentence1 || Buffer::isFileEnd()) {//sentence1不允许递归拓展
