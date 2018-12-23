@@ -28,7 +28,18 @@ void Parser::parse() {
     }
 
     tk = scanner.next();
+    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "(") {
+        printToken(tk);
+        err(31);
+    }
 
+    tk = scanner.next();
+    if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != ")") {
+        //有参数,处理参数
+        parameter();
+    }
+
+    tk = scanner.next();
     if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "{") {
         //error:函数没有以大括号开头
         printToken(tk);
@@ -36,7 +47,8 @@ void Parser::parse() {
     } else {
         //生成开头四元式 (functionName, null, null, null)
         Quaternary qt;
-        qt.setOption(functionName);
+        std::string s = "$" + functionName;
+        qt.setOption(s);
         qt.setFirst(Token());
         qt.setSecond(Token());
         qt.setTarget(Token());
@@ -55,7 +67,8 @@ void Parser::parse() {
     } else {
         //生成结尾四元式 (endFunction, null, null, null)
         Quaternary qt;
-        qt.setOption("endMain");
+        std::string s = "end$"+functionName;
+        qt.setOption(s);
         qt.setFirst(Token());
         qt.setSecond(Token());
         qt.setTarget(Token());
@@ -807,6 +820,10 @@ void Parser::arrayInit(Token tmptk) {
         printToken(tk);
         err(29);
     }
+    //初始化开头四元式
+    Quaternary init;
+    init.setOption("arrayInit");
+    quaterList.insert(init);
     
     //tk = scanner.next();
     int cnt = 0;
@@ -837,8 +854,15 @@ void Parser::arrayInit(Token tmptk) {
         tk = scanner.next();
     } while(tk.getCategory() == Token::symbol && opList.get(tk.getOffset()) == ",");
 
+    init.setOption("endArrayInit");
+    quaterList.insert(init);
+
     if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != "}") {
         printToken(tk);
         err(29);
     }
+}
+
+void Parser::parameter() {
+
 }

@@ -28,6 +28,7 @@ private:
     void array();
     void processArray();
     void arrayInit(Token tmptk);
+    void parameter();
     bool isConstantOrIdentify(Token::Categories cat);
     Token getTarget(int type);
 };
