@@ -36,11 +36,12 @@ string errList[] = {
     "28.数组下标必须为整形数",
     "29.数组初始化格式错误",
     "30.缺少分号",
-    "31.函数小括号不正确 "
+    "31.函数小括号不正确",
+    "32.print参数必须为变量或常量"
 };
 
 void err(int code) {
-    if(code < 32 && code >= 0) cout << errList[code] << endl;
+    if(code < 33 && code >= 0) cout << errList[code] << endl;
     else cout << "未定义的错误类型" << endl;
     exit(0);
 }

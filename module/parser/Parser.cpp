@@ -109,6 +109,10 @@ void Parser::sentence() {
     } else if(tk.getCategory() == Token::keyword && keywordList.get(tk.getOffset()) == "do") {
         tk = scanner.next();
         dowhloop();
+    } else if(tk.getCategory() == Token::keyword && keywordList.get(tk.getOffset()) == "print") {
+        tk = scanner.next();
+        print();
+        tk = scanner.next();
     } else {
         content();
         tk = scanner.next();//防止分号被重复读取
@@ -865,4 +869,28 @@ void Parser::arrayInit(Token tmptk) {
 
 void Parser::parameter() {
 
+}
+
+void Parser::print() {
+    Quaternary qt;
+    qt.setOption("print");
+    
+    processArray();
+
+    Token::Categories cat = tk.getCategory();
+    if(cat != Token::id && cat != Token::integer && cat != Token::real && cat != Token::ch) {
+        printToken(tk);
+        err(32);
+    }
+    qt.setFirst(tk);
+    quaterList.insert(qt);
+    tk = scanner.next();
+
+    if(tk.getCategory() == Token::symbol && opList.get(tk.getOffset()) == "+") {
+        tk = scanner.next();
+        print();
+    } else if(tk.getCategory() != Token::symbol || opList.get(tk.getOffset()) != ";") {
+        printToken(tk);
+        err(30);
+    }
 }

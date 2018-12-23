@@ -3,15 +3,16 @@ cc = clang
 CLANGFLAG = -lstdc++ -std=c++11
 target = mcc
 main = mcc.o
-object = SymbolList.o Common.o Token.o TypeList.o Buffer.o Scanner.o Quaternary.o Parser.o Tool.o Error.o ArrayInformation.o
+object = SymbolList.o Common.o Token.o TypeList.o Buffer.o Scanner.o Quaternary.o Parser.o Tool.o Error.o ArrayInformation.o DAG.o
 
 TOP_PATH = $(shell pwd)
 
-CPPFLAGS = -I$(TOP_PATH)/module/common -I$(TOP_PATH)/module/scanner -I$(TOP_PATH)/module/parser -I$(TOP_PATH)/tool
+CPPFLAGS = -I$(TOP_PATH)/module/common -I$(TOP_PATH)/module/scanner -I$(TOP_PATH)/module/parser -I$(TOP_PATH)/tool -I$(TOP_PATH)/module/simplifer
 
 vpath % ./module/common
 vpath % ./module/scanner
 vpath % ./module/parser
+vpath % ./module/simplifer
 vpath % ./tool
 
 $(target): $(object) $(main)

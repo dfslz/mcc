@@ -5,25 +5,25 @@
 #include "SymbolList.h"
 #include "Parser.h"
 #include "Tool.h"
+#include "DAG.h"
 
 using namespace std;
 
 
 int main(int argc, char** argv) {
-    if(argc < 2) {
-         cout << "please input target file" << endl;
-         return 0;
-    }
-
-    fin.open(argv[1], std::ios_base::in);
-    if(!fin) {
-        cout << "not a valide input" << endl;
-        return 0;
-    }
+    processParameter(argc, argv);
     synbl.pushLoacle();
 
     parser.parse();
-    printQuaterList();
+    if(display_quaterList) printQuaterList();
+
+    DAG tmp;
+    while(!tmp.getPrepareForEnd()) {
+        tmp.simplify();
+        tmp.finalQuaterList();
+        tmp.setActivityList();
+    }
+    if(display_quaterList_simplified) printQuaterList();
 
     fin.close();
     return 0;

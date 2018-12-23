@@ -1,7 +1,12 @@
 #include "Common.h"
 
+bool display_token;
+bool display_quaterList;
+bool display_quaterList_simplified;
+
 //目标文件输入流
 std::ifstream fin;
+std::ofstream fout;
 
 //常数表
 ConstantList<int> intList;

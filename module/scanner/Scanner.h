@@ -6,6 +6,7 @@
 #include <cstring>
 #include "Common.h"
 #include "Buffer.h"
+#include "Tool.h"
 
 class Scanner {
 public:

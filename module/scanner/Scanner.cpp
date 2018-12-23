@@ -57,6 +57,7 @@ Token Scanner::next() {
         tk.setOffset(-1);
     }
     
+    if(display_token) printToken(tk);
     return tk;
 }
 

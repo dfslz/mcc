@@ -10,8 +10,14 @@
 #include "Quaternary.h"
 #include "ArrayInformation.h"
 
+//参数命令控制
+extern bool display_token;
+extern bool display_quaterList;
+extern bool display_quaterList_simplified;
+
 //目标文件输入流
 extern std::ifstream fin;
+extern std::ofstream fout;
 
 //id最大长度
 const int _id_len = 100;

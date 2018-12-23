@@ -6,5 +6,6 @@
 void printToken(Token tk);
 int getLength(std::string type);
 void printQuaterList();
+void processParameter(int argc, char**argv);
 
 #endif
