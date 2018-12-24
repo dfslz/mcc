@@ -6,6 +6,7 @@
 #include "Parser.h"
 #include "Tool.h"
 #include "DAG.h"
+#include "Translate.h"
 
 using namespace std;
 
@@ -15,7 +16,7 @@ int main(int argc, char** argv) {
     synbl.pushLoacle();
 
     parser.parse();
-    if(display_quaterList) printQuaterList();
+    if(display_quaterList) std::cout << "产生的四元式:\n",printQuaterList();
 
     DAG tmp;
     while(!tmp.getPrepareForEnd()) {
@@ -23,7 +24,9 @@ int main(int argc, char** argv) {
         tmp.finalQuaterList();
         tmp.setActivityList();
     }
-    if(display_quaterList_simplified) printQuaterList();
+    if(display_quaterList_simplified) std::cout << "\n优化后的四元式\n",printQuaterList();
+
+    translate();
 
     fin.close();
     return 0;

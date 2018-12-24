@@ -802,7 +802,7 @@ void Parser::processArray() {//需要在紧接着的下一条scanner.next()前�
         err(28);
     }
     //TODO 处理下标写入变量四元式
-    if(tmptk.getCategory() == Token::integer) tk.setPosition(intList.get(tmptk.getOffset()));//注意是设置tk
+    if(tmptk.getCategory() == Token::integer) tk.setPosition(tmptk.getOffset());//注意是设置tk
     else {//检查变量是否定义过,同时设置tk的position为变量在符号表中的相反数
         if(synbl.getCategory(tmptk.getOffset()) == SymbolList::null) {//未定义
             printToken(tmptk);

@@ -1,0 +1,51 @@
+自定义数据结构:
+数组 type[size] -> id;
+     id[position]
+结构体 struct typename { clarify } 
+
+//while四元式
+<wh, _, _, _>
+<条件判断四元式>
+<do, 条件, _, _>
+<sentence>
+<we, _, _, _>
+
+//do...while四元式设计
+<=, 1, _, @dwht>
+<wh, _, _, _>
+<do, @dwht, _, _>
+<sentence>
+<比较运算四元式赋值给@dwht>
+<we, _, _, _>
+
+//for四元式
+<初始化语句四元式>
+<wh, _, _, _>
+<条件判断四元式>
+<do, 条件, _, _>
+<sentence>
+<结尾四元式>
+<we, _, _, _>
+
+//数组定义
+读数组大小
+写入类型表
+typeList.insert()
+写入数组信息表元素类型
+arrayList.setType()
+设置类型名为基础类型+数组大小
+写入数组信息表元素大小,计算数组总大小
+arrayList.setSize()
+读变量名
+写符号表
+设置类型,cat,并分配地址
+
+//数组使用
+设置token为array类型
+读位置
+设置token的position参数
+
+//函数信息
+function(a, b, c)翻译成
+	push a, b, c
+	call function
